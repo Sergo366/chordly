@@ -41,7 +41,6 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
     //todo: add edit category logic
     // updateCategory({ id: categoryId, name: categoryName });
   };
-// @beautifulMention сделай Add category функциональность где пользователь будет добавлять все нужные поля согласно полям в базе данных это должно быть в модальном окне
 
   const handleDeleteCategory = (e: React.MouseEvent) => {
     e.stopPropagation();

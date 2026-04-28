@@ -39,3 +39,18 @@ export const updateUserCategory = async (categoryParams: Partial<Category> & { i
     console.error('Error updating category:', error);
   }
 }
+
+export type CreateCategoryParams = {
+  name: string;
+  iconName?: string;
+  categoryTypes?: { id: string; name: string }[];
+};
+
+export const createUserCategory = async (params: CreateCategoryParams) => {
+  try {
+    const response = await apiClient.post<Category[]>('/categories', params);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating category:', error);
+  }
+}
