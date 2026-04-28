@@ -36,10 +36,12 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
     updateCategory({ id: categoryId, isHidden: !isHidden });
   };
 
-  const handleRename = (e: React.MouseEvent) => {
+  const handleEditCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
-    updateCategory({ id: categoryId, name: categoryName });
+    //todo: add edit category logic
+    // updateCategory({ id: categoryId, name: categoryName });
   };
+// @beautifulMention сделай Add category функциональность где пользователь будет добавлять все нужные поля согласно полям в базе данных это должно быть в модальном окне
 
   const handleDeleteCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -120,14 +122,14 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
                       <MenuItem>
                         {({ focus }) => (
                           <button
-                            onClick={handleRename}
+                            onClick={handleEditCategory}
                             className={classNames(
                               focus ? MENU_STYLES.itemActive : MENU_STYLES.itemInactive,
                               MENU_STYLES.item
                             )}
                           >
                             <Pencil className={classNames(MENU_STYLES.icon, focus ? MENU_STYLES.iconActive : MENU_STYLES.iconInactive)} />
-                            <span>Rename</span>
+                            <span>Edit</span>
                           </button>
                         )}
                       </MenuItem>

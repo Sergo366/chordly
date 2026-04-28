@@ -50,6 +50,26 @@ export class CategoriesService {
     return this.findAllByUser(userId);
   }
 
+  async createUserCategory(
+    userId: string,
+    body: {
+      name: string;
+      iconName?: string;
+      categoryTypes?: { id: string; name: string }[];
+    },
+  ): Promise<UserCategory[]> {
+    const userCategory = this.categoriesRepository.create({
+      userId,
+      name: body.name,
+      iconName: body.iconName || '',
+      isHidden: false,
+      categoryTypes: body.categoryTypes || [],
+    });
+
+    await this.categoriesRepository.save(userCategory);
+    return this.findAllByUser(userId);
+  }
+
   async updateUserCategory(
     userId: string,
     body: Partial<UserCategory>,
