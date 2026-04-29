@@ -10,6 +10,7 @@ import { Sparkles } from 'lucide-react';
 import { SPECIAL_SECTION_CONFIG } from '@/app/(main)/wardrobe/[category]/const';
 import { useCategories } from '@/hooks/useCategories';
 import { WardrobePageMenu } from '@/components/wardrobe/wardrobePageMenu';
+import { Category } from '@/api/categories';
 
 export default function WardrobePage() {
   const router = useRouter();
@@ -24,11 +25,11 @@ export default function WardrobePage() {
   }, [clothes]);
 
   const groupedClothes = useMemo(() => {
-    const groups: Record<string, { id: string; name: string; items: Clothing[]; isHidden: boolean }> = {};
+    const groups: Record<string, { id: string; name: string; items: Clothing[]; isHidden: boolean; category: Category }> = {};
 
     categoriesData?.forEach(cat => {
       if (cat.isHidden && !showHidden) return;
-      groups[cat.id] = { id: cat.id, name: cat.name, items: [], isHidden: cat.isHidden };
+      groups[cat.id] = { id: cat.id, name: cat.name, items: [], isHidden: cat.isHidden, category: cat };
     });
 
     filteredClothes.forEach((item: Clothing) => {
@@ -109,6 +110,7 @@ export default function WardrobePage() {
                   categoryName={group.name}
                   items={group.items}
                   isHidden={group.isHidden}
+                  category={group.category}
                   onOpen={(id) => router.push(`/wardrobe/${id}`)}
                 />
               ))}

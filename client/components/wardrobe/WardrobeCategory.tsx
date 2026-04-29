@@ -11,6 +11,8 @@ import { DROPDOWN_TRANSITION } from '@/lib/styles/header';
 import { useRemoveCategories } from '@/hooks/useCategories/useRemoveCategories';
 import { useConfirmation } from '@/components/modals/ConfirmationModal';
 import { useUpdateCategories } from '@/hooks/useCategories/useUpdateCategories';
+import { CategoryModal } from '@/components/modals/AddCategoryModal';
+import { Category } from '@/api/categories';
 
 interface WardrobeCategoryProps {
   categoryId: string; // The ID of the category (or slug for special sections)
@@ -20,11 +22,13 @@ interface WardrobeCategoryProps {
   titleIcon?: React.ElementType;
   hideMenu?: boolean;
   isHidden?: boolean;
+  category?: Category;
 }
 
-export default function WardrobeCategory({ categoryId, categoryName, items, onOpen, titleIcon: TitleIcon, hideMenu, isHidden }: WardrobeCategoryProps) {
+export default function WardrobeCategory({ categoryId, categoryName, items, onOpen, titleIcon: TitleIcon, hideMenu, isHidden, category }: WardrobeCategoryProps) {
   const { mutate: removeCategory } = useRemoveCategories();
   const { mutate: updateCategory }  = useUpdateCategories()
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
 
   const { openConfirmation } = useConfirmation()
 
@@ -38,8 +42,7 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
 
   const handleEditCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
-    //todo: add edit category logic
-    // updateCategory({ id: categoryId, name: categoryName });
+    setIsEditOpen(true);
   };
 
   const handleDeleteCategory = (e: React.MouseEvent) => {
@@ -206,6 +209,15 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
           </div>
         )}
       </div>
+      
+      {category && (
+        <CategoryModal 
+          isOpen={isEditOpen} 
+          onClose={() => setIsEditOpen(false)} 
+          category={category} 
+        />
+      )}
     </div>
   );
 }
+

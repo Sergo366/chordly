@@ -14,11 +14,14 @@ import {
 import { X, Plus, Trash2, Loader2 } from 'lucide-react';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { useCreateCategory } from '@/hooks/useCategories/useCreateCategory';
+import { useUpdateCategories } from '@/hooks/useCategories/useUpdateCategories';
 import { randomUUID } from '@/lib/utils/uuid';
+import { Category } from '@/api/categories';
 
-interface AddCategoryModalProps {
+interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
+  category?: Category;
 }
 
 interface CategoryTypeItem {
@@ -31,11 +34,29 @@ const initialFormState = {
   iconName: '',
 };
 
-export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
+export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps) {
   const [formData, setFormData] = useState(initialFormState);
   const [categoryTypes, setCategoryTypes] = useState<CategoryTypeItem[]>([]);
   const [newTypeName, setNewTypeName] = useState('');
-  const { mutate: createCategory, isPending } = useCreateCategory();
+  
+  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
+  const { mutate: updateCategory, isPending: isUpdating } = useUpdateCategories();
+
+  const isPending = isCreating || isUpdating;
+  const isEdit = !!category;
+
+  React.useEffect(() => {
+    if (category && isOpen) {
+      setFormData({
+        name: category.name,
+        iconName: category.iconName || '',
+      });
+      setCategoryTypes(category.categoryTypes || []);
+    } else if (!isOpen) {
+      setFormData(initialFormState);
+      setCategoryTypes([]);
+    }
+  }, [category, isOpen]);
 
   const resetAndClose = () => {
     setFormData(initialFormState);
@@ -69,18 +90,31 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
   const handleSubmit = () => {
     if (!formData.name.trim()) return;
 
-    createCategory(
-      {
-        name: formData.name.trim(),
-        iconName: formData.iconName || undefined,
-        categoryTypes: categoryTypes.length > 0 ? categoryTypes : [],
-      },
-      {
-        onSuccess: () => {
-          resetAndClose();
+    const payload = {
+      name: formData.name.trim(),
+      iconName: formData.iconName || undefined,
+      categoryTypes: categoryTypes.length > 0 ? categoryTypes : [],
+    };
+
+    if (isEdit && category) {
+      updateCategory(
+        { id: category.id, ...payload },
+        {
+          onSuccess: () => {
+            resetAndClose();
+          },
         },
-      },
-    );
+      );
+    } else {
+      createCategory(
+        payload,
+        {
+          onSuccess: () => {
+            resetAndClose();
+          },
+        },
+      );
+    }
   };
 
   const isValid = formData.name.trim().length > 0;
@@ -114,7 +148,7 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
               <DialogPanel className="w-full max-w-md transform rounded-3xl bg-zinc-950 border border-zinc-800 p-8 text-left align-middle shadow-2xl transition-all">
                 <div className="flex items-center justify-between mb-6">
                   <DialogTitle as="h3" className="text-2xl font-light text-white">
-                    New Category
+                    {isEdit ? 'Edit Category' : 'New Category'}
                   </DialogTitle>
                   <button
                     onClick={resetAndClose}
@@ -237,7 +271,7 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
                     `}
                   >
                     {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isPending ? 'Creating...' : 'Create'}
+                    {isPending ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update' : 'Create')}
                   </button>
                 </div>
               </DialogPanel>

@@ -3,7 +3,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/r
 import { classNames } from '@/lib/styles/classNames';
 import { Eye, EyeOff, MoreVertical, Plus } from 'lucide-react';
 import { DROPDOWN_TRANSITION, MENU_STYLES } from '@/lib/styles/header';
-import { AddCategoryModal } from '@/components/modals/AddCategoryModal';
+import { CategoryModal } from '@/components/modals/AddCategoryModal';
 
 interface WardrobePageMenuProps {
   showHidden: boolean;
@@ -88,7 +88,7 @@ export const WardrobePageMenu = ({ showHidden, onToggleShowHidden }: WardrobePag
         </Menu>
       </div>
 
-      <AddCategoryModal
+      <CategoryModal
         isOpen={isAddCategoryOpen}
         onClose={() => setIsAddCategoryOpen(false)}
       />
