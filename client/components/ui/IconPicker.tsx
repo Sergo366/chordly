@@ -143,7 +143,11 @@ export function IconPicker({ value, onChange, disabled }: IconPickerProps) {
         <div
           className="absolute z-50 left-0 right-0 mt-2 p-3 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl shadow-black/40 animate-in fade-in slide-in-from-top-2 duration-200"
         >
-          <div className="grid grid-cols-6 gap-1.5 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
+          <div 
+            className="grid grid-cols-6 gap-1.5 max-h-[140px] overflow-y-auto pr-1 overscroll-contain custom-scrollbar"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             {CATEGORY_ICONS.map(({ name, icon: Icon }) => {
               const isSelected = value === name;
               return (

@@ -73,7 +73,7 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
       {
         name: formData.name.trim(),
         iconName: formData.iconName || undefined,
-        categoryTypes: categoryTypes.length > 0 ? categoryTypes : undefined,
+        categoryTypes: categoryTypes.length > 0 ? categoryTypes : [],
       },
       {
         onSuccess: () => {
@@ -111,7 +111,7 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
               leaveFrom="opacity-100 scale-100 translate-y-0"
               leaveTo="opacity-0 scale-95 translate-y-4"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-3xl bg-zinc-950 border border-zinc-800 p-8 text-left align-middle shadow-2xl transition-all">
+              <DialogPanel className="w-full max-w-md transform rounded-3xl bg-zinc-950 border border-zinc-800 p-8 text-left align-middle shadow-2xl transition-all">
                 <div className="flex items-center justify-between mb-6">
                   <DialogTitle as="h3" className="text-2xl font-light text-white">
                     New Category
