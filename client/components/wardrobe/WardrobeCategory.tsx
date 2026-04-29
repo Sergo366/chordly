@@ -13,19 +13,18 @@ import { useConfirmation } from '@/components/modals/ConfirmationModal';
 import { useUpdateCategories } from '@/hooks/useCategories/useUpdateCategories';
 import { CategoryModal } from '@/components/modals/AddCategoryModal';
 import { Category } from '@/api/categories';
+import { ICON_MAP } from '@/components/ui/IconPicker';
 
-interface WardrobeCategoryProps {
-  categoryId: string; // The ID of the category (or slug for special sections)
-  categoryName: string; // The name of the category
+interface WardrobeCategoryProps extends Partial<Category> {
+  id: string; 
+  name: string;
   items: Clothing[];
   onOpen: (id: string) => void;
-  titleIcon?: React.ElementType;
+  iconName?: string;
   hideMenu?: boolean;
-  isHidden?: boolean;
-  category?: Category;
 }
 
-export default function WardrobeCategory({ categoryId, categoryName, items, onOpen, titleIcon: TitleIcon, hideMenu, isHidden, category }: WardrobeCategoryProps) {
+export default function WardrobeCategory({ id, name, items, onOpen, iconName, hideMenu, isHidden, ...categoryProps }: WardrobeCategoryProps) {
   const { mutate: removeCategory } = useRemoveCategories();
   const { mutate: updateCategory }  = useUpdateCategories()
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -37,7 +36,7 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
 
   const toggleHideCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
-    updateCategory({ id: categoryId, isHidden: !isHidden });
+    updateCategory({ id, isHidden: !isHidden });
   };
 
   const handleEditCategory = (e: React.MouseEvent) => {
@@ -52,22 +51,24 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
       title: 'Delete Category',
       content: 'Are you sure you want to delete this category?',
       onConfirm: () => {
-        removeCategory(categoryId);
+        removeCategory(id);
       }
     })
   }
 
+  const HeaderIcon = iconName ? ICON_MAP[iconName] : Shirt;
+
   return (
     <div 
-      onClick={() => onOpen(categoryId)}
+      onClick={() => onOpen(id)}
       className={CARD_STYLES.base}
     >  
       <div className={CARD_STYLES.header}>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            {TitleIcon && <TitleIcon className="w-5 h-5 text-stone-400 group-hover:text-primary transition-colors" />}
+            {<HeaderIcon />}
             <h2 className={CARD_STYLES.title}>
-              {categoryName}
+              {name}
             </h2>
             {isHidden && (
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
@@ -210,11 +211,11 @@ export default function WardrobeCategory({ categoryId, categoryName, items, onOp
         )}
       </div>
       
-      {category && (
+      {categoryProps.userId && (
         <CategoryModal 
           isOpen={isEditOpen} 
           onClose={() => setIsEditOpen(false)} 
-          category={category} 
+          category={{ id, name, isHidden: !!isHidden, ...categoryProps } as Category} 
         />
       )}
     </div>

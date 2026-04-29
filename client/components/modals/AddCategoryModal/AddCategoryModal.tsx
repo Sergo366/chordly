@@ -12,7 +12,7 @@ import {
   Label,
 } from '@headlessui/react';
 import { X, Plus, Trash2, Loader2 } from 'lucide-react';
-import { IconPicker } from '@/components/ui/IconPicker';
+import { IconPicker } from '@/components/ui/IconPicker/IconPicker';
 import { useCreateCategory } from '@/hooks/useCategories/useCreateCategory';
 import { useUpdateCategories } from '@/hooks/useCategories/useUpdateCategories';
 import { randomUUID } from '@/lib/utils/uuid';

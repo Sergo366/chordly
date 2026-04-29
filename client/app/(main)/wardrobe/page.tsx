@@ -25,11 +25,11 @@ export default function WardrobePage() {
   }, [clothes]);
 
   const groupedClothes = useMemo(() => {
-    const groups: Record<string, { id: string; name: string; items: Clothing[]; isHidden: boolean; category: Category }> = {};
+    const groups: Record<string, Category & { items: Clothing[] }> = {};
 
     categoriesData?.forEach(cat => {
       if (cat.isHidden && !showHidden) return;
-      groups[cat.id] = { id: cat.id, name: cat.name, items: [], isHidden: cat.isHidden, category: cat };
+      groups[cat.id] = { ...cat, items: [] };
     });
 
     filteredClothes.forEach((item: Clothing) => {
@@ -106,11 +106,7 @@ export default function WardrobePage() {
               {Object.values(groupedClothes).map((group) => (
                 <WardrobeCategory
                   key={group.id}
-                  categoryId={group.id}
-                  categoryName={group.name}
-                  items={group.items}
-                  isHidden={group.isHidden}
-                  category={group.category}
+                  {...group}
                   onOpen={(id) => router.push(`/wardrobe/${id}`)}
                 />
               ))}
@@ -129,11 +125,11 @@ export default function WardrobePage() {
                 return (
                   <WardrobeCategory
                     key={slug}
-                    categoryId={slug}
-                    categoryName={config.label}
+                    id={slug}
+                    name={config.label}
                     items={collectionItems}
                     onOpen={(id) => router.push(`/wardrobe/${id}`)}
-                    titleIcon={config.Icon}
+                    iconName={config.iconName}
                     hideMenu={true}
                   />
                 );
