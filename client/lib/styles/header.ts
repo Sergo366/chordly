@@ -1,8 +1,8 @@
 export const MENU_STYLES = {
-  items: "origin-top-right absolute right-0 mt-3 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] bg-[#0e0e11]/95 backdrop-blur-3xl border border-white/10 focus:outline-none py-1.5 overflow-hidden",
+  items: "origin-top-right absolute right-0 mt-3 rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.9)] bg-[#0c0c0e] border border-white/20 focus:outline-none py-1.5 overflow-hidden z-[100]",
   item: "flex items-center px-2 py-2 text-[13px] font-medium rounded-xl transition-all gap-3 w-full cursor-pointer",
-  itemActive: "bg-white/5 text-primary",
-  itemInactive: "text-stone-400",
+  itemActive: "bg-white/10 text-white font-semibold shadow-inner",
+  itemInactive: "text-stone-400 hover:text-stone-200 hover:bg-white/5",
   itemDanger: "bg-red-500/10 text-red-500",
   itemDangerInactive: "text-red-500/60",
   icon: "h-4 w-4 transition-colors",

@@ -32,7 +32,7 @@ export const WardrobePageMenu = ({ showHidden, onToggleShowHidden }: WardrobePag
               </MenuButton>
 
               <Transition as={Fragment} {...DROPDOWN_TRANSITION}>
-                <MenuItems className={classNames(MENU_STYLES.items, 'w-44 px-1.5 z-10')}>
+                <MenuItems className={classNames(MENU_STYLES.items, 'w-44 px-1.5')}>
                   <MenuItem>
                     {({ focus }) => (
                       <button
