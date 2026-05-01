@@ -8,8 +8,8 @@
     "server"
   ],
   "scripts": {
-    "dev:client": "concurrently \"cd client && npx next dev\"",
-    "dev:server": "concurrently \"cd server && npx nest start --watch\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && docker-compose up --build",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "build:client": "npm run build --workspace=client",
     "build:server": "npm run build --workspace=server",

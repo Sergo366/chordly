@@ -11,5 +11,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  api:
+    build:
+      context: .
+      target: development # Use the development stage from the Dockerfile
+    container_name: fitly-api
+    ports:
+      - '4001:4001'
+      - '9229:9229' # For debugging
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    command: npm run start:debug
+
 volumes:
   postgres_data:
