@@ -8,6 +8,7 @@ import WardrobeSidebar from '@/components/wardrobe/WardrobeSidebar';
 import { ChevronLeft, Shirt } from 'lucide-react';
 import { SPECIAL_SECTION_CONFIG } from '@/app/(main)/wardrobe/[category]/const';
 import { useCategories } from '@/hooks/useCategories';
+import { ICON_MAP } from '@/components/ui/IconPicker';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -51,7 +52,7 @@ export default function CategoryPage() {
 
   const pageTitle = specialConfig?.label ?? currentCategory?.name ?? 'Category';
   const pageDescription = specialConfig?.description ?? `${categoryItems.length} items in your collection`;
-  const EmptyIcon = specialConfig?.Icon ?? Shirt;
+  const EmptyIcon = (specialConfig?.iconName ? ICON_MAP[specialConfig.iconName] : null) ?? Shirt;
   const emptyIconClass = specialConfig?.iconClass ?? 'text-stone-600';
   const emptyMessage = specialConfig?.EmptyMessage ?? 'No items in this category yet.';
 
