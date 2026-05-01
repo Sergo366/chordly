@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild, Field, Input, Label, Select } from '@headlessui/react';
 import { X, Edit2, Check, Shirt, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
-import { CATEGORIES, SEASONS, TYPES, Category, Season } from '@fitly/shared';
+import { CATEGORIES, SEASONS, TYPES, Category, Season } from '@/shared/clothes';
 import { Clothing } from '@/api/clothes';
 import { useUpdateClothes } from '@/hooks/use-clothes';
 import { useToast } from '@/hooks/useToast';

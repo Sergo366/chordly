@@ -7,7 +7,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from '../users/user.entity';
-import { Season } from '@fitly/shared';
+import { Season } from '../common/clothes';
 
 @Entity()
 export class Clothing {

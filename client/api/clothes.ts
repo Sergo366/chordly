@@ -1,5 +1,5 @@
 import apiClient from '@/lib/api-client';
-import { Category, Season } from '@fitly/shared';
+import { Category, Season } from '@/shared/clothes';
 
 export interface SerperImageResult {
     title: string;

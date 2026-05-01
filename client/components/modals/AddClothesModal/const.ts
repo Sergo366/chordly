@@ -1,4 +1,4 @@
-import { Category, Season } from "@fitly/shared";
+import { Category, Season } from "@/shared/clothes";
 
 export type FormValues = {
     title: string;

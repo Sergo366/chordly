@@ -5,7 +5,7 @@ import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild, Field, I
 import { X, Check, Loader2 } from 'lucide-react';
 import { SerperImageResult } from '@/api/clothes';
 import Image from 'next/image';
-import { SEASONS, Category, Season } from '@fitly/shared';
+import { SEASONS, Category, Season } from '@/shared/clothes';
 import { useSaveClothing } from '@/hooks/use-clothes';
 import { defaultFormValues } from './const';
 import { useToast } from '@/hooks/useToast';

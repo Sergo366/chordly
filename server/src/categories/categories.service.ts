@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserCategory } from './user-category.entity';
-import { CATEGORY_TYPES, TYPES } from '@fitly/shared';
+import { CATEGORY_TYPES, TYPES } from '../common/clothes';
 import { randomUUID } from 'crypto';
 
 @Injectable()

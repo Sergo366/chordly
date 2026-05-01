@@ -5,18 +5,15 @@
   "description": "Fitly monorepo - Next.js client and NestJS server",
   "workspaces": [
     "client",
-    "server",
-    "shared"
+    "server"
   ],
   "scripts": {
     "dev:client": "concurrently \"cd client && npx next dev\"",
     "dev:server": "concurrently \"cd server && npx nest start --watch\"",
-    "dev:shared": "npm run dev --workspace=shared",
-    "dev": "concurrently \"npm run dev:shared\" \"npm run dev:server\" \"npm run dev:client\"",
-    "build:shared": "npm run build --workspace=shared",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "build:client": "npm run build --workspace=client",
     "build:server": "npm run build --workspace=server",
-    "build": "npm run build:shared && npm run build --workspaces",
+    "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
     "test:client": "npm run test --workspace=client",
     "test:server": "npm run test --workspace=server",

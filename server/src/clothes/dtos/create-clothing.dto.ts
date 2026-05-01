@@ -1,5 +1,5 @@
 import { IsString, IsIn, IsBoolean, IsOptional } from 'class-validator';
-import { CATEGORIES, SEASONS, Season } from '@fitly/shared';
+import { CATEGORIES, SEASONS, Season } from '../../common/clothes';
 
 export class CreateClothingDto {
   @IsString()
