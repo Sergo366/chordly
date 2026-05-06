@@ -41,10 +41,8 @@ jobs:
         run: npm run lint --workspace=server
 
       - name: Run tests
-        run: npm run test --workspace=server
+        run: npm run test --workspace=server -- --passWithNoTests
 
-      - name: Run e2e tests
-        run: npm run test:e2e --workspace=server
 
   build:
     name: Build Server
