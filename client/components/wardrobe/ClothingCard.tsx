@@ -113,7 +113,7 @@ const getClothingCardActions = (item: Clothing) => [
         </div>
         
         {/* Status Indicators */}
-        <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+        <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 items-start">
           {item.isFavorite && (
             <div className="bg-primary/20 backdrop-blur-md p-1.5 rounded-full border border-primary/20">
               <Heart className="w-3.5 h-3.5 text-primary fill-primary" />
