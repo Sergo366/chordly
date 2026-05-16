@@ -1,8 +1,15 @@
 import apiClient from '@/lib/api-client';
 
+export interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
+  accessToken: string;
+  user: User;
 }
 
 export interface AuthCredentials {

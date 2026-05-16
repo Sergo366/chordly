@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Mail, Lock, Loader2, Shirt, Eye, EyeOff } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
-import { authApi, AuthCredentials } from '@/api/auth';
+import { authApi, AuthCredentials, AuthResponse } from '@/api/auth';
 import { AxiosError } from 'axios';
+import Cookies from 'js-cookie';
 import { classNames } from '@/lib/styles/classNames';
 
 export default function AuthPage() {
@@ -29,14 +30,22 @@ export default function AuthPage() {
 
   const loginMutation = useMutation({
     mutationFn: (data: AuthCredentials) => authApi.signin(data),
-    onSuccess: () => {
+    onSuccess: (data: AuthResponse) => {
+      // Manually set access_token cookie for localhost if it came in the body
+      if (data.accessToken) {
+        Cookies.set('access_token', data.accessToken, { expires: 1 });
+      }
       router.push('/');
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: (data: AuthCredentials) => authApi.signup(data),
-    onSuccess: () => {
+    onSuccess: (data: AuthResponse) => {
+      // Manually set access_token cookie for localhost if it came in the body
+      if (data.accessToken) {
+        Cookies.set('access_token', data.accessToken, { expires: 1 });
+      }
       router.push('/');
     },
   });

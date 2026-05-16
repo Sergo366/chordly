@@ -58,6 +58,7 @@ export class AuthController {
 
     return {
       user: tokens.user,
+      accessToken: tokens.access_token,
     };
   }
 
@@ -76,6 +77,7 @@ export class AuthController {
 
     return {
       user: tokens.user,
+      accessToken: tokens.access_token,
     };
   }
 
@@ -104,6 +106,7 @@ export class AuthController {
 
     return {
       user: tokens.user,
+      accessToken: tokens.access_token,
     };
   }
 }
