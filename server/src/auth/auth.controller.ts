@@ -23,18 +23,20 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   private setCookies(res: Response, tokens: Tokens) {
+    const isProd = process.env.NODE_ENV === 'production';
+
     res.cookie('access_token', tokens.access_token, {
       httpOnly: false, // Accessible by Next.js middleware
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use lax for local development
+      secure: true, // Must be true for sameSite: 'none'
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       path: '/',
     });
 
     res.cookie('refresh_token', tokens.refresh_token, {
       httpOnly: true, // Secure
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
