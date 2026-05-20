@@ -16,16 +16,29 @@ interface AddClothesModalProps {
     onClose: () => void;
     searchResults: SerperImageResult[];
     ticker?: string;
+    initialCategory?: Category;
 }
 
-export function AddClothesModal({ isOpen, onClose, searchResults, ticker }: AddClothesModalProps) {
+export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initialCategory }: AddClothesModalProps) {
     const { toast } = useToast();
     const { data: categoriesData } = useCategories()
 
     const [step, setStep] = useState<'selection' | 'details'>('selection');
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [formData, setFormData] = useState(defaultFormValues);
+    const [formData, setFormData] = useState({
+        ...defaultFormValues,
+        category: initialCategory || defaultFormValues.category
+    });
     const { mutate: saveClothing, isPending: isSaving } = useSaveClothing();
+
+    // Recommended React pattern to update state on prop change without useEffect
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
+        if (isOpen) {
+            setFormData(prev => ({ ...prev, category: initialCategory || defaultFormValues.category }));
+        }
+    }
 
     const categoryTypes = useMemo(() => {
       if (!formData.category || !categoriesData) {

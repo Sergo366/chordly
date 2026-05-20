@@ -1,0 +1,108 @@
+'use client';
+
+import React from 'react';
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
+import { X, Upload, Tag } from 'lucide-react';
+
+interface UploadChoiceModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onTagPhotoSelect?: (file: File) => void;
+}
+
+export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadChoiceModalProps) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onTagPhotoSelect) {
+      onTagPhotoSelect(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  return (
+    <Transition show={isOpen} as={React.Fragment}>
+      <Dialog as="div" className="relative z-[100]" onClose={onClose}>
+        <TransitionChild
+          as={React.Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+        </TransitionChild>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <TransitionChild
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95 translate-y-4"
+              enterTo="opacity-100 scale-100 translate-y-0"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100 translate-y-0"
+              leaveTo="opacity-0 scale-95 translate-y-4"
+            >
+              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-3xl bg-zinc-950 border border-zinc-800 p-8 text-left align-middle shadow-2xl transition-all">
+                <div className="flex items-center justify-between mb-8">
+                  <DialogTitle as="h3" className="text-2xl font-light text-white">
+                    Add new item
+                  </DialogTitle>
+                  <button
+                    onClick={onClose}
+                    className="p-2 rounded-full cursor-pointer hover:bg-white/5 transition-colors text-zinc-400 hover:text-white"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <button
+                    onClick={() => {
+                      // TODO: Implement photo upload logic
+                    }}
+                    className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium text-lg">Upload your photo</h4>
+                      <p className="text-sm text-zinc-400">Add an item from your camera roll</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                      <Tag className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium text-lg">Find by photo tag</h4>
+                      <p className="text-sm text-zinc-400">Take a picture of the label</p>
+                    </div>
+                  </button>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/jpeg, image/png"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+}
