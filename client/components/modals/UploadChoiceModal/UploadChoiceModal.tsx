@@ -12,6 +12,22 @@ interface UploadChoiceModalProps {
 
 export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadChoiceModalProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const generalFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
+      setError(null);
+    }
+  }, [isOpen, previewUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,6 +37,26 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleGeneralFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
+        return;
+      }
+      setError(null);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+    if (generalFileInputRef.current) {
+      generalFileInputRef.current.value = '';
+    }
+  };
+
+  const handleUpload = () => {
+    console.log('Uploading photo:', selectedFile);
   };
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -62,39 +98,78 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <button
-                    onClick={() => {
-                      // TODO: Implement photo upload logic
-                    }}
-                    className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                      <Upload className="w-6 h-6" />
+                  {previewUrl ? (
+                    <div className="flex flex-col gap-4">
+                      <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex gap-3 mt-2">
+                        <button
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setPreviewUrl(null);
+                            setError(null);
+                          }}
+                          className="flex-1 py-3 px-4 rounded-xl border border-zinc-800 bg-transparent text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleUpload}
+                          className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors cursor-pointer"
+                        >
+                          Upload
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-white font-medium text-lg">Upload your photo</h4>
-                      <p className="text-sm text-zinc-400">Add an item from your camera roll</p>
-                    </div>
-                  </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => generalFileInputRef.current?.click()}
+                        className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                          <Upload className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-medium text-lg">Upload your photo</h4>
+                          <p className="text-sm text-zinc-400">Add an item from your camera roll</p>
+                        </div>
+                      </button>
 
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                      <Tag className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-white font-medium text-lg">Find by photo tag</h4>
-                      <p className="text-sm text-zinc-400">Take a picture of the label</p>
-                    </div>
-                  </button>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-colors group text-left cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                          <Tag className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-medium text-lg">Find by photo tag</h4>
+                          <p className="text-sm text-zinc-400">Take a picture of the label</p>
+                        </div>
+                      </button>
+
+                      {error && (
+                        <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+                      )}
+                    </>
+                  )}
+
+                  <input
+                    type="file"
+                    ref={generalFileInputRef}
+                    className="hidden"
+                    accept="image/jpeg, image/png, image/webp, image/jpg"
+                    onChange={handleGeneralFileChange}
+                  />
 
                   <input
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
-                    accept="image/jpeg, image/png"
+                    accept="image/jpeg, image/png, image/webp, image/jpg"
                     onChange={handleFileChange}
                   />
                 </div>
