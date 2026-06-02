@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
-import { X, Upload, Tag } from 'lucide-react';
+import { X, Upload, Tag, Loader2 } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 interface UploadChoiceModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = React.useState(false);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -42,8 +44,29 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
   const handleGeneralFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
+      const allowedMimeTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/heic',
+        'image/heif',
+        'image/heic-sequence',
+        'image/heif-sequence',
+      ];
+
+      const fileType = file.type.toLowerCase();
+      const fileName = file.name.toLowerCase();
+      const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+      const hasValidMimeType = allowedMimeTypes.includes(fileType);
+
+      if (!hasValidExtension && !hasValidMimeType) {
+        setError('Unsupported file format. Please upload a JPEG, PNG, WebP, or HEIC/HEIF image.');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size must be less than 5MB');
         return;
       }
       setError(null);
@@ -55,8 +78,64 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
     }
   };
 
-  const handleUpload = () => {
-    console.log('Uploading photo:', selectedFile);
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setError('Please select a file to upload.');
+      return;
+    }
+
+    // 1. Size Validation (<= 5MB)
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+    if (selectedFile.size > MAX_SIZE_BYTES) {
+      setError('File size must not exceed 5MB.');
+      return;
+    }
+
+    // 2. Type Validation (jpeg, png, webp, heic, heif)
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/heic',
+      'image/heif',
+      'image/heic-sequence',
+      'image/heif-sequence',
+    ];
+
+    const fileType = selectedFile.type.toLowerCase();
+    const fileName = selectedFile.name.toLowerCase();
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+    const hasValidMimeType = allowedMimeTypes.includes(fileType);
+
+    if (!hasValidExtension && !hasValidMimeType) {
+      setError('Unsupported file format. Please upload a JPEG, PNG, WebP, or HEIC/HEIF image.');
+      return;
+    }
+
+    setError(null);
+    setIsCompressing(true);
+
+    try {
+      // 3. Compression
+      const options = {
+        maxSizeMB: 1, // Target max size in MB after compression
+        maxWidthOrHeight: 1920, // Max dimensions (aspect ratio preserved)
+        useWebWorker: true,
+      };
+
+      console.log('Starting photo compression for:', selectedFile.name, `(${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`);
+      const compressedFile = await imageCompression(selectedFile, options);
+      console.log('Compressed photo:', compressedFile);
+      console.log(`Original size: ${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`);
+      console.log(`Compressed size: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+      setError(null);
+    } catch (err) {
+      console.error('Compression error:', err);
+      setError('Failed to compress image. Please try again.');
+    } finally {
+      setIsCompressing(false);
+    }
   };
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -106,20 +185,29 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
                       </div>
                       <div className="flex gap-3 mt-2">
                         <button
+                          disabled={isCompressing}
                           onClick={() => {
                             setSelectedFile(null);
                             setPreviewUrl(null);
                             setError(null);
                           }}
-                          className="flex-1 py-3 px-4 rounded-xl border border-zinc-800 bg-transparent text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                          className="flex-1 py-3 px-4 rounded-xl border border-zinc-800 bg-transparent text-white hover:bg-zinc-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Cancel
                         </button>
                         <button
+                          disabled={isCompressing}
                           onClick={handleUpload}
-                          className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors cursor-pointer"
+                          className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed"
                         >
-                          Upload
+                          {isCompressing ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Compressing...
+                            </>
+                          ) : (
+                            'Upload'
+                          )}
                         </button>
                       </div>
                     </div>
@@ -150,18 +238,18 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
                           <p className="text-sm text-zinc-400">Take a picture of the label</p>
                         </div>
                       </button>
-
-                      {error && (
-                        <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-                      )}
                     </>
+                  )}
+
+                  {error && (
+                    <p className="text-red-500 text-sm text-center mt-2">{error}</p>
                   )}
 
                   <input
                     type="file"
                     ref={generalFileInputRef}
                     className="hidden"
-                    accept="image/jpeg, image/png, image/webp, image/jpg"
+                    accept="image/jpeg, image/png, image/webp, image/jpg, image/heic, image/heif, .heic, .heif"
                     onChange={handleGeneralFileChange}
                   />
 
@@ -169,7 +257,7 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
-                    accept="image/jpeg, image/png, image/webp, image/jpg"
+                    accept="image/jpeg, image/png, image/webp, image/jpg, image/heic, image/heif, .heic, .heif"
                     onChange={handleFileChange}
                   />
                 </div>

@@ -8,8 +8,8 @@ import dynamic from 'next/dynamic';
 import ClothingCard from '@/components/wardrobe/ClothingCard';
 
 const AddClothesModal = dynamic(
-    () => import('@/components/modals/AddClothesModal/AddClothesModal').then(mod => mod.AddClothesModal),
-    { ssr: false }
+  () => import('@/components/modals/AddClothesModal/AddClothesModal').then(mod => mod.AddClothesModal),
+  { ssr: false }
 );
 import WardrobeSidebar from '@/components/wardrobe/WardrobeSidebar';
 import { ChevronLeft, Shirt, Plus } from 'lucide-react';
