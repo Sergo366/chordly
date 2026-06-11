@@ -17,14 +17,15 @@ interface AddClothesModalProps {
     searchResults: SerperImageResult[];
     ticker?: string;
     initialCategory?: Category;
+    initialImageUrl?: string;
 }
 
-export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initialCategory }: AddClothesModalProps) {
+export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initialCategory, initialImageUrl }: AddClothesModalProps) {
     const { toast } = useToast();
     const { data: categoriesData } = useCategories()
 
-    const [step, setStep] = useState<'selection' | 'details'>('selection');
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [step, setStep] = useState<'selection' | 'details'>(initialImageUrl ? 'details' : 'selection');
+    const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl || null);
     const [formData, setFormData] = useState({
         ...defaultFormValues,
         category: initialCategory || defaultFormValues.category
@@ -37,6 +38,8 @@ export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initia
         setPrevIsOpen(isOpen);
         if (isOpen) {
             setFormData(prev => ({ ...prev, category: initialCategory || defaultFormValues.category }));
+            setStep(initialImageUrl ? 'details' : 'selection');
+            setSelectedImage(initialImageUrl || null);
         }
     }
 
@@ -286,10 +289,10 @@ export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initia
                                                 </button>
                                                 <button
                                                     onClick={handleConfirm}
-                                                    disabled={!formData.title || !formData.category || formData.seasons.length === 0 || isSaving}
+                                                    disabled={!(formData.title || formData.userTitle) || !formData.category || formData.seasons.length === 0 || isSaving}
                                                     className={`
                                                         flex-[2] px-8 py-3 cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
-                                                        ${(!formData.title || !formData.category || formData.seasons.length === 0 || isSaving)
+                                                        ${(!(formData.title || formData.userTitle) || !formData.category || formData.seasons.length === 0 || isSaving)
                                                             ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
                                                             : 'bg-primary text-background hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95'}
                                                     `}

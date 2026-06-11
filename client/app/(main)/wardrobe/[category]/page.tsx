@@ -24,6 +24,7 @@ export default function CategoryPage() {
   const router = useRouter();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddClothesModalOpen, setIsAddClothesModalOpen] = useState(false);
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const { data: uploadData, mutate: addClothing } = useAddClothing();
   const categoryIdOrSlug = decodeURIComponent(params.category as string);
@@ -88,6 +89,12 @@ export default function CategoryPage() {
             toast.error(getErrorMessage(err) || 'Failed to analyze clothes');
         }
     });
+  };
+
+  const handleCustomPhotoUpload = (url: string) => {
+    setIsAddModalOpen(false);
+    setCustomImageUrl(url);
+    setIsAddClothesModalOpen(true);
   };
 
   return (
@@ -163,14 +170,19 @@ export default function CategoryPage() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onTagPhotoSelect={handleTagPhotoSelect}
+        onCustomPhotoUpload={handleCustomPhotoUpload}
       />
-      {uploadData && (
+      {(uploadData || customImageUrl) && (
         <AddClothesModal 
             isOpen={isAddClothesModalOpen}
-            onClose={() => setIsAddClothesModalOpen(false)}
-            searchResults={uploadData.searchResults || []}
-            ticker={uploadData.ticker}
+            onClose={() => {
+                setIsAddClothesModalOpen(false);
+                setCustomImageUrl(null);
+            }}
+            searchResults={uploadData?.searchResults || []}
+            ticker={uploadData?.ticker}
             initialCategory={currentCategory?.name as Category}
+            initialImageUrl={customImageUrl || undefined}
         />
       )}
     </div>

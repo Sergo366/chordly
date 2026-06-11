@@ -4,14 +4,16 @@ import React from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { X, Upload, Tag, Loader2 } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
+import { clothesApi } from '@/api/clothes';
 
 interface UploadChoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTagPhotoSelect?: (file: File) => void;
+  onCustomPhotoUpload?: (url: string) => void;
 }
 
-export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadChoiceModalProps) {
+export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect, onCustomPhotoUpload }: UploadChoiceModalProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const generalFileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -123,16 +125,23 @@ export function UploadChoiceModal({ isOpen, onClose, onTagPhotoSelect }: UploadC
         maxWidthOrHeight: 1920, // Max dimensions (aspect ratio preserved)
         useWebWorker: true,
       };
-
-      console.log('Starting photo compression for:', selectedFile.name, `(${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`);
       const compressedFile = await imageCompression(selectedFile, options);
-      console.log('Compressed photo:', compressedFile);
-      console.log(`Original size: ${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`);
-      console.log(`Compressed size: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+
+      // 4. Get Presigned S3 Upload URL
+      const { uploadUrl, fileUrl } = await clothesApi.getPresignedUrl(
+        selectedFile.name,
+        compressedFile.type,
+      );
+
+      // 5. Upload compressed file to S3
+      await clothesApi.uploadToS3(uploadUrl, compressedFile);
       setError(null);
+      if (onCustomPhotoUpload) {
+        onCustomPhotoUpload(fileUrl);
+      }
     } catch (err) {
-      console.error('Compression error:', err);
-      setError('Failed to compress image. Please try again.');
+      console.error('Upload/Compression error:', err);
+      setError('Failed to upload image. Please try again.');
     } finally {
       setIsCompressing(false);
     }
