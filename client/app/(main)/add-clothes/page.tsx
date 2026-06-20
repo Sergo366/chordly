@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Upload, X, Image as ImageIcon, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAddClothing } from '@/hooks/use-clothes';
 import { useToast } from '@/hooks/useToast';
+import imageCompression from 'browser-image-compression';
+import { clothesApi } from '@/api/clothes';
 
 const AddClothesModal = dynamic(
     () => import('@/components/modals/AddClothesModal/AddClothesModal').then(mod => mod.AddClothesModal),
@@ -20,6 +22,8 @@ export default function AddClothesPage() {
     const [preview, setPreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
+    const [isCustomUploading, setIsCustomUploading] = useState(false);
     const { toast } = useToast();
 
     const { data: clothesData, mutate: addClothing, isPending: isUploading, isSuccess: uploadSuccess, reset: resetUpload } = useAddClothing();
@@ -100,8 +104,31 @@ export default function AddClothesPage() {
         return err instanceof Error ? err.message : String(err);
     };
 
+    const handleCustomUpload = async () => {
+        if (!file) return;
+        setIsCustomUploading(true);
+        try {
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+            };
+            const compressedFile = await imageCompression(file, options);
+            const { uploadUrl, fileUrl } = await clothesApi.getPresignedUrl(file.name, compressedFile.type);
+            await clothesApi.uploadToS3(uploadUrl, compressedFile);
+            setCustomImageUrl(fileUrl);
+            setIsModalOpen(true);
+        } catch (err) {
+            console.error('Custom upload error:', err);
+            toast.error('Failed to upload custom image. Please try again.');
+        } finally {
+            setIsCustomUploading(false);
+        }
+    };
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setCustomImageUrl(null);
         removeFile();
     };
 
@@ -185,41 +212,72 @@ export default function AddClothesPage() {
                 )}
             </div>
 
-            <button
-                onClick={handleUpload}
-                disabled={!file || isUploading || uploadSuccess}
-                className={`
-                    w-full py-4 rounded-2xl font-semibold text-lg transition-all duration-300
-                    flex items-center justify-center gap-2 cursor-pointer
-                    ${!file || isUploading || uploadSuccess
-                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                        : 'bg-primary text-background hover:bg-primary-hover active:scale-[0.98] shadow-lg shadow-primary/10'
-                    }
-                `}
-            >
-                {isUploading ? (
-                    <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Updating wardrobe...
-                    </>
-                ) : uploadSuccess && file ? (
-                    <>
-                        <CheckCircle2 className="w-5 h-5" />
-                        Done
-                    </>
-                ) : (
-                    <>
-                        <ImageIcon className="w-5 h-5" />
-                        Add to wardrobe
-                    </>
-                )}
-            </button>
+            {file && (
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                        onClick={handleUpload}
+                        disabled={isUploading || isCustomUploading || uploadSuccess}
+                        className={`
+                            flex-1 py-4 rounded-2xl font-semibold text-lg transition-all duration-300
+                            flex items-center justify-center gap-2 cursor-pointer
+                            ${isUploading || isCustomUploading || uploadSuccess
+                                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                                : 'bg-primary text-background hover:bg-primary-hover active:scale-[0.98] shadow-lg shadow-primary/10'
+                            }
+                        `}
+                    >
+                        {isUploading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Analyzing...
+                            </>
+                        ) : uploadSuccess ? (
+                            <>
+                                <CheckCircle2 className="w-5 h-5" />
+                                Done
+                            </>
+                        ) : (
+                            <>
+                                <ImageIcon className="w-5 h-5" />
+                                Find similar (AI)
+                            </>
+                        )}
+                    </button>
+                    
+                    <button
+                        onClick={handleCustomUpload}
+                        disabled={isUploading || isCustomUploading || uploadSuccess}
+                        className={`
+                            flex-1 py-4 rounded-2xl font-semibold text-lg transition-all duration-300
+                            flex items-center justify-center gap-2 cursor-pointer
+                            border border-zinc-800 bg-zinc-900/50 text-white
+                            ${isUploading || isCustomUploading || uploadSuccess
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hover:bg-zinc-800 hover:border-zinc-700 active:scale-[0.98]'
+                            }
+                        `}
+                    >
+                        {isCustomUploading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Uploading...
+                            </>
+                        ) : (
+                            <>
+                                <Upload className="w-5 h-5" />
+                                Use this photo directly
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
 
             <AddClothesModal 
                 isOpen={isModalOpen}
                 onClose={handleCloseModal} 
                 searchResults={clothesData?.searchResults || []}
                 ticker={clothesData?.ticker}
+                initialImageUrl={customImageUrl || undefined}
             />
         </div>
     );
