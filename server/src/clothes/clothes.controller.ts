@@ -15,11 +15,28 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ClothesService } from './clothes.service';
 import { CreateClothingDto } from './dtos/create-clothing.dto';
 import { UpdateClothingDto } from './dtos/update-clothing.dto';
+import { GetPresignedUrlDto } from './dtos/get-presigned-url.dto';
 import { GetCurrentUserId } from '../auth/decorators/get-current-user-id.decorator';
+import { S3Service } from './s3.service';
 
 @Controller('clothes')
 export class ClothesController {
-  constructor(private readonly clothesService: ClothesService) {}
+  constructor(
+    private readonly clothesService: ClothesService,
+    private readonly s3Service: S3Service,
+  ) {}
+
+  @Post('/presigned-url')
+  async getPresignedUrl(
+    @Body() body: GetPresignedUrlDto,
+    @GetCurrentUserId() userId: string,
+  ) {
+    return this.s3Service.getPresignedUploadUrl(
+      body.filename,
+      body.contentType,
+      userId,
+    );
+  }
 
   @Post('/get-clothes-from-image')
   @UseInterceptors(FileInterceptor('image'))

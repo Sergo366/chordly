@@ -16,16 +16,32 @@ interface AddClothesModalProps {
     onClose: () => void;
     searchResults: SerperImageResult[];
     ticker?: string;
+    initialCategory?: Category;
+    initialImageUrl?: string;
 }
 
-export function AddClothesModal({ isOpen, onClose, searchResults, ticker }: AddClothesModalProps) {
+export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initialCategory, initialImageUrl }: AddClothesModalProps) {
     const { toast } = useToast();
     const { data: categoriesData } = useCategories()
 
-    const [step, setStep] = useState<'selection' | 'details'>('selection');
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [formData, setFormData] = useState(defaultFormValues);
+    const [step, setStep] = useState<'selection' | 'details'>(initialImageUrl ? 'details' : 'selection');
+    const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl || null);
+    const [formData, setFormData] = useState({
+        ...defaultFormValues,
+        category: initialCategory || defaultFormValues.category
+    });
     const { mutate: saveClothing, isPending: isSaving } = useSaveClothing();
+
+    // Recommended React pattern to update state on prop change without useEffect
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
+        if (isOpen) {
+            setFormData(prev => ({ ...prev, category: initialCategory || defaultFormValues.category }));
+            setStep(initialImageUrl ? 'details' : 'selection');
+            setSelectedImage(initialImageUrl || null);
+        }
+    }
 
     const categoryTypes = useMemo(() => {
       if (!formData.category || !categoriesData) {
@@ -273,10 +289,10 @@ export function AddClothesModal({ isOpen, onClose, searchResults, ticker }: AddC
                                                 </button>
                                                 <button
                                                     onClick={handleConfirm}
-                                                    disabled={!formData.title || !formData.category || formData.seasons.length === 0 || isSaving}
+                                                    disabled={!(formData.title || formData.userTitle) || !formData.category || formData.seasons.length === 0 || isSaving}
                                                     className={`
                                                         flex-[2] px-8 py-3 cursor-pointer rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
-                                                        ${(!formData.title || !formData.category || formData.seasons.length === 0 || isSaving)
+                                                        ${(!(formData.title || formData.userTitle) || !formData.category || formData.seasons.length === 0 || isSaving)
                                                             ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
                                                             : 'bg-primary text-background hover:bg-primary-hover shadow-lg shadow-primary/20 active:scale-95'}
                                                     `}

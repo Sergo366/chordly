@@ -50,6 +50,13 @@ export default function AuthPage() {
     },
   });
 
+  const handleTabChange = () => {
+    setFormData({ email: '', password: '', confirmPassword: '' });
+    setPasswordMismatch(false);
+    loginMutation.reset();
+    registerMutation.reset();
+  };
+
   const handleAuth = (type: 'signin' | 'signup') => {
     console.log(type);
     if (type === 'signin') {
@@ -90,7 +97,7 @@ export default function AuthPage() {
           {/* Animated border line at top */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#A855F7]/30 to-transparent opacity-50" />
 
-          <TabGroup>
+          <TabGroup onChange={handleTabChange}>
             <TabList className="flex p-1.5 space-x-1 bg-white/5 rounded-2xl mb-8 border border-white/5">
               {['Login', 'Register'].map((category) => (
                 <Tab
@@ -116,12 +123,13 @@ export default function AuthPage() {
                   className="space-y-5"
                 >
                   <div>
-                    <label className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Email Address</label>
+                    <label htmlFor="login-email" className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Email Address</label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Mail className="h-5 w-5 text-stone-500 group-focus-within:text-primary transition-colors" />
                       </div>
                       <input
+                        id="login-email"
                         type="email"
                         name="email"
                         required
@@ -134,12 +142,13 @@ export default function AuthPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Password</label>
+                    <label htmlFor="login-password" className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Password</label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Lock className="h-5 w-5 text-stone-500 group-focus-within:text-primary transition-colors" />
                       </div>
                       <input
+                        id="login-password"
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         required
@@ -184,12 +193,13 @@ export default function AuthPage() {
                   className="space-y-5"
                 >
                   <div>
-                    <label className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Email Address</label>
+                    <label htmlFor="register-email" className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Email Address</label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Mail className="h-5 w-5 text-stone-500 group-focus-within:text-primary transition-colors" />
                       </div>
                       <input
+                        id="register-email"
                         type="email"
                         name="email"
                         required
@@ -202,12 +212,13 @@ export default function AuthPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Password</label>
+                    <label htmlFor="register-password" className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Password</label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Lock className="h-5 w-5 text-stone-500 group-focus-within:text-primary transition-colors" />
                       </div>
                       <input
+                        id="register-password"
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         required
@@ -228,12 +239,13 @@ export default function AuthPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Confirm Password</label>
+                    <label htmlFor="register-confirm-password" className="block text-sm text-[var(--text-color-secondary)] mb-2 ml-1">Confirm Password</label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Lock className={`h-5 w-5 transition-colors ${passwordMismatch ? 'text-rose-400' : 'text-stone-500 group-focus-within:text-primary'}`} />
                       </div>
                       <input
+                        id="register-confirm-password"
                         type={showConfirmPassword ? 'text' : 'password'}
                         name="confirmPassword"
                         required

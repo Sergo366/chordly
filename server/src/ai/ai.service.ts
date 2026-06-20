@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -21,13 +21,13 @@ export class AiService {
   async getClothingTicker(buffer: Buffer, mimeType: string): Promise<string> {
     try {
       const model = this.genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash-001',
+        model: 'gemini-2.5-flash',
       });
 
       const base64Image = buffer.toString('base64');
 
       const prompt =
-        'Identify this clothing item from the tag. Provide a unique google-search ticker in the format: [Brand]-[ArticleNumber]-[ColorCode]. Use the most specific IDs found on the label (like Index No. or Reference). Return ONLY the ticker symbol.';
+        'You are an expert at identifying clothing items for Google Image Search. Analyze this photo (which may be a clothing tag or the clothing itself). Your goal is to generate the best possible Google Search query to find this exact item.\n\nPriority 1: If you see any specific model numbers, article numbers, style codes, reference IDs, or barcode numbers on the tag, return: "[Brand] [ArticleNumber]".\n\nPriority 2: If no specific article numbers are visible, extract the brand, color, and specific style/fit of the clothing. Return: "[Brand] [Color] [Style/Type]" (e.g., "Nike Red Zip-Up Hoodie", "Zara Black V-Neck T-Shirt").\n\nRULES:\n1. Return ONLY the search query string. Do not use quotes.\n2. Do NOT include generic irrelevant words like "gym", "left", "right", "photo", "tag".\n3. The query MUST be highly specific to finding this clothing item in a Google Search.';
 
       const result = await model.generateContent({
         contents: [
@@ -45,21 +45,22 @@ export class AiService {
           },
         ],
         generationConfig: {
-          maxOutputTokens: 40, // Ограничение ускоряет "завершение" ответа
-          temperature: 0, // Нулевая температура делает ответ быстрее и точнее
+          maxOutputTokens: 300,
+          temperature: 0,
         },
       });
+      console.log('result23', result);
+      const ticker = result.response.text().trim();
+      console.log('ticker23', ticker);
+      if (ticker === 'NOT_FOUND' || ticker.includes('NOT_FOUND')) {
+        return '';
+      }
 
-      return result.response.text().trim();
+      return ticker;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      console.error('Gemini API Error details:', {
-        error,
-      });
-      throw new InternalServerErrorException(
-        `Failed to analyze image with Gemini: ${errorMessage}`,
-      );
+      console.log('Gemini API Error details:', error);
+      console.error('Gemini API Error details:', error);
+      return '';
     }
   }
 }

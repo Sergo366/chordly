@@ -23,7 +23,8 @@ export class CreateClothingDto {
   seasons: Season[];
 
   @IsString()
-  ticker: string;
+  @IsOptional()
+  ticker?: string;
 
   @IsBoolean()
   @IsOptional()

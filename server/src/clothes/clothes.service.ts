@@ -1,5 +1,9 @@
 import 'multer';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Clothing } from './clothing.entity';
@@ -30,9 +34,19 @@ export class ClothesService {
       );
     }
 
-    let searchResults: SerperImageResult[] = [];
-    if (ticker) {
-      searchResults = await this.searchService.findImages(ticker);
+    if (!ticker) {
+      // Throw error if ticker is empty to trigger frontend error handling
+      throw new BadRequestException(
+        'Error. Could not identify a clothing ticker from the image. Please try again later',
+      );
+    }
+
+    const searchResults = await this.searchService.findImages(ticker);
+
+    if (!searchResults || searchResults.length === 0) {
+      throw new NotFoundException(
+        'No similar images found for the identified clothing.',
+      );
     }
 
     return {

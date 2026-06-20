@@ -1,18 +1,32 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useGetClothes } from '@/hooks/use-clothes';
+import { useGetClothes, useAddClothing } from '@/hooks/use-clothes';
+import { useToast } from '@/hooks/useToast';
+import dynamic from 'next/dynamic';
 import ClothingCard from '@/components/wardrobe/ClothingCard';
+
+const AddClothesModal = dynamic(
+  () => import('@/components/modals/AddClothesModal/AddClothesModal').then(mod => mod.AddClothesModal),
+  { ssr: false }
+);
 import WardrobeSidebar from '@/components/wardrobe/WardrobeSidebar';
-import { ChevronLeft, Shirt } from 'lucide-react';
+import { ChevronLeft, Shirt, Plus } from 'lucide-react';
 import { SPECIAL_SECTION_CONFIG } from '@/app/(main)/wardrobe/[category]/const';
 import { useCategories } from '@/hooks/useCategories';
 import { ICON_MAP } from '@/components/ui/IconPicker';
+import { UploadChoiceModal } from '@/components/modals/UploadChoiceModal/UploadChoiceModal';
+import { Category } from '@/shared/clothes';
 
 export default function CategoryPage() {
   const params = useParams();
   const router = useRouter();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddClothesModalOpen, setIsAddClothesModalOpen] = useState(false);
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { data: uploadData, mutate: addClothing } = useAddClothing();
   const categoryIdOrSlug = decodeURIComponent(params.category as string);
   const { data: clothes, isLoading: isLoadingClothes } = useGetClothes();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
@@ -55,6 +69,33 @@ export default function CategoryPage() {
   const EmptyIcon = (specialConfig?.iconName ? ICON_MAP[specialConfig.iconName] : null) ?? Shirt;
   const emptyIconClass = specialConfig?.iconClass ?? 'text-stone-600';
   const emptyMessage = specialConfig?.EmptyMessage ?? 'No items in this category yet.';
+
+  const handleTagPhotoSelect = (file: File) => {
+    setIsAddModalOpen(false);
+    toast.success('Analyzing photo tag...');
+    addClothing(file, {
+        onSuccess: () => {
+            setIsAddClothesModalOpen(true);
+        },
+        onError: (err) => {
+            const getErrorMessage = (err: unknown) => {
+                if (!err) return null;
+                if (typeof err === 'object' && 'response' in err) {
+                    const axiosError = err as { response: { data: { message?: string } } };
+                    return axiosError.response?.data?.message || 'Upload failed. Please try again.';
+                }
+                return err instanceof Error ? err.message : String(err);
+            };
+            toast.error(getErrorMessage(err) || 'Failed to analyze clothes');
+        }
+    });
+  };
+
+  const handleCustomPhotoUpload = (url: string) => {
+    setIsAddModalOpen(false);
+    setCustomImageUrl(url);
+    setIsAddClothesModalOpen(true);
+  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-transparent">
@@ -99,6 +140,13 @@ export default function CategoryPage() {
                     : `${categoryItems.length} items in your collection`}
                 </p>
               </div>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-background font-semibold hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all cursor-pointer"
+              >
+                <Plus className="w-5 h-5 stroke-[2.5]" />
+                Add new item
+              </button>
             </div>
 
             {categoryItems.length > 0 ? (
@@ -118,6 +166,25 @@ export default function CategoryPage() {
           </div>
         </div>
       </div>
+      <UploadChoiceModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onTagPhotoSelect={handleTagPhotoSelect}
+        onCustomPhotoUpload={handleCustomPhotoUpload}
+      />
+      {(uploadData || customImageUrl) && (
+        <AddClothesModal 
+            isOpen={isAddClothesModalOpen}
+            onClose={() => {
+                setIsAddClothesModalOpen(false);
+                setCustomImageUrl(null);
+            }}
+            searchResults={uploadData?.searchResults || []}
+            ticker={uploadData?.ticker}
+            initialCategory={currentCategory?.name as Category}
+            initialImageUrl={customImageUrl || undefined}
+        />
+      )}
     </div>
   );
 }
