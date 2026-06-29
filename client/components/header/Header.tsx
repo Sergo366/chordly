@@ -12,8 +12,7 @@ import { classNames } from '@/lib/styles/classNames';
 const navigation = [
   { name: 'Look analyze', href: '/analyze' },
   { name: 'My Wardrobe', href: '/wardrobe' },
-  { name: 'Create Look', href: '/create-look' },
-  { name: 'Pricing', href: '/pricing' },
+  { name: 'Sales', href: '/sales' },
 ];
 
 export default function Header() {
@@ -124,21 +123,6 @@ export default function Header() {
                         >
                           <User className={classNames(MENU_STYLES.icon, active ? MENU_STYLES.iconActive : MENU_STYLES.iconInactive)} />
                           Your Profile
-                        </Link>
-                      )}
-                    </HeadlessMenu.Item>
-
-                    <HeadlessMenu.Item>
-                      {({ active }) => (
-                        <Link
-                          href="/library"
-                          className={classNames(
-                            active ? MENU_STYLES.itemActive : MENU_STYLES.itemInactive,
-                            MENU_STYLES.item
-                          )}
-                        >
-                          <Shirt className={classNames(MENU_STYLES.icon, active ? MENU_STYLES.iconActive : MENU_STYLES.iconInactive)} />
-                          My Library
                         </Link>
                       )}
                     </HeadlessMenu.Item>

@@ -61,7 +61,7 @@ export default function ClothingCard({ item, className = '' }: ClothingCardProps
       clothesId: item.id, 
       data: { isForSale: !item.isForSale } 
     }, {
-      onSuccess: () => toast.success(item.isForSale ? 'Removed from sale' : 'Marked for sale')
+      onSuccess: () => toast.success(item.isForSale ? 'Removed from sales' : 'Marked for sales')
     });
   };
 
