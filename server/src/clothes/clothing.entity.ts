@@ -57,7 +57,7 @@ export class Clothing {
     cascade: true,
     nullable: true,
   })
-  sale: Sale;
+  sale: Sale | null;
 
   @CreateDateColumn()
   createdAt: Date;

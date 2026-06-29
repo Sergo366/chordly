@@ -16,6 +16,16 @@ export interface SerperImageResult {
   position: number;
 }
 
+export type SaleCurrency = 'EUR' | 'USD' | 'UAH';
+
+export interface SaleData {
+  title: string;
+  price: number;
+  currency: SaleCurrency;
+  description?: string | null;
+  isNegotiable: boolean;
+}
+
 export interface SaveClothingData {
   imageUrl: string;
   title: string;
@@ -27,6 +37,7 @@ export interface SaveClothingData {
   isFavorite?: boolean;
   isHidden?: boolean;
   isForSale?: boolean;
+  sale?: SaleData | null;
 }
 
 export interface Clothing {
@@ -45,6 +56,7 @@ export interface Clothing {
   isFavorite?: boolean;
   isHidden?: boolean;
   isForSale?: boolean;
+  sale?: SaleData;
   searchResults?: SerperImageResult[];
 }
 

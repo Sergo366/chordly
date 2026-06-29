@@ -1,5 +1,13 @@
-import { IsString, IsIn, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsIn,
+  IsBoolean,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { CATEGORIES, SEASONS, Season } from '../../common/clothes';
+import { CreateSaleDto } from './create-sale.dto';
+import { Type } from 'class-transformer';
 
 export class CreateClothingDto {
   @IsString()
@@ -9,6 +17,7 @@ export class CreateClothingDto {
   userTitle: string;
 
   @IsString()
+  @IsOptional()
   imageUrl: string;
 
   @IsString()
@@ -37,4 +46,9 @@ export class CreateClothingDto {
   @IsBoolean()
   @IsOptional()
   isForSale?: boolean;
+
+  @IsOptional()
+  @Type(() => CreateSaleDto)
+  @ValidateNested()
+  sale?: CreateSaleDto;
 }
