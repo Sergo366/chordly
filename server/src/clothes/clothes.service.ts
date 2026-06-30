@@ -12,7 +12,7 @@ import { CreateClothingDto } from './dtos/create-clothing.dto';
 import { AiService } from '../ai/ai.service';
 import { GoogleSearchService } from '../google-search/google-search.service';
 import { SerperImageResult } from 'src/google-search/interfaces/search-response.interface';
-import { Sale } from './sale.entity';
+import { Sale } from '../sales/entities/sale.entity';
 
 @Injectable()
 export class ClothesService {

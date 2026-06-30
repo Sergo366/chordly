@@ -6,7 +6,7 @@ import { Clothing } from './clothing.entity';
 import { AiModule } from '../ai/ai.module';
 import { GoogleSearchModule } from '../google-search/google-search.module';
 import { S3Service } from './s3.service';
-import { Sale } from './sale.entity';
+import { Sale } from '../sales/entities/sale.entity';
 
 @Module({
   imports: [

@@ -7,7 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Clothing } from './clothing.entity';
+import { Clothing } from '../../clothes/clothing.entity';
 
 export enum Currency {
   EUR = 'EUR',

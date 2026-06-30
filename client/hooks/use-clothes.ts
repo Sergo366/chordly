@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { clothesApi, SaveClothingData } from '@/api/clothes';
-import { getCategories } from '@/api/categories';
+import { salesApi } from '@/api/sales';
 
 export const useAddClothing = () => {
     const queryClient = useQueryClient();
@@ -49,6 +49,14 @@ export const useUpdateClothes = () => {
         mutationFn: clothesApi.updateClothes,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['clothes'] });
+            queryClient.invalidateQueries({ queryKey: ['sales'] });
         },
+    });
+};
+
+export const useGetSales = () => {
+    return useQuery({
+        queryKey: [],
+        queryFn: () => salesApi.findSales(),
     });
 };

@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { Currency } from '../sale.entity';
+import { Currency } from '../../sales/entities/sale.entity';
 
 export class CreateSaleDto {
   @IsString()

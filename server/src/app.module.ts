@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AiModule } from './ai/ai.module';
 import { GoogleSearchModule } from './google-search/google-search.module';
 import { CategoriesModule } from './categories/categories.module';
+import { SalesModule } from './sales/sales.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CategoriesModule } from './categories/categories.module';
     AiModule,
     GoogleSearchModule,
     CategoriesModule,
+    SalesModule,
   ],
   controllers: [AppController],
   providers: [
