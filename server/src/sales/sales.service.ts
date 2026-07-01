@@ -1,21 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Sale } from './entities/sale.entity';
 import { Repository } from 'typeorm';
+import { Clothing } from 'src/clothes/clothing.entity';
 
 @Injectable()
 export class SalesService {
   constructor(
-    @InjectRepository(Sale)
-    private readonly saleRepository: Repository<Sale>,
+    @InjectRepository(Clothing)
+    private readonly clothesRepository: Repository<Clothing>,
   ) {}
 
   async getAllSales() {
     try {
-      const sales = await this.saleRepository.find();
-      return sales;
+      return await this.clothesRepository.find({
+        where: {
+          isForSale: true,
+        },
+        relations: ['sale'],
+      });
     } catch (error) {
-      console.error('Error fetching sales:', error);
+      new InternalServerErrorException(error, 'Could not get data for sales');
     }
   }
 }
