@@ -1,12 +1,24 @@
 'use client';
 
-import { useGetSales } from '@/hooks/use-clothes';
+import { useEffect } from 'react';
+import { useGetSalesInfinite } from '@/hooks/use-clothes';
 import SalesCard from '@/components/wardrobe/SalesCard';
 import SalesCardSkeleton from '@/components/wardrobe/SalesCardSkeleton';
 import { ShoppingBag, Package } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
 
 export default function SalesPage() {
-  const { data: sales, isLoading, error } = useGetSales();
+  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetSalesInfinite();
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const allSales = data?.pages.flatMap((page) => page.data) || [];
+  const totalItems = data?.pages[0]?.meta.total || 0;
 
   return (
     <div className="min-h-screen bg-[#0D0D0F]">
@@ -41,18 +53,28 @@ export default function SalesPage() {
             <h2 className="text-xl font-semibold text-white mb-2">Failed to load sales</h2>
             <p className="text-stone-400">Please try again later</p>
           </div>
-        ) : sales && sales.length > 0 ? (
+        ) : allSales.length > 0 ? (
           <>
             <div className="flex items-center justify-between mb-6">
               <p className="text-stone-400 text-sm">
-                {sales.length} item{sales.length !== 1 ? 's' : ''} for sale
+                {totalItems} item{totalItems !== 1 ? 's' : ''} for sale
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {sales.map((item) => (
+              {allSales.map((item) => (
                 <SalesCard key={item.id} item={item} />
               ))}
             </div>
+            {/* Infinite scroll trigger */}
+            {hasNextPage && (
+              <div ref={ref} className="mt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <SalesCardSkeleton key={i} />
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">

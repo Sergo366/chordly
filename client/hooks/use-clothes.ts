@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { clothesApi, SaveClothingData } from '@/api/clothes';
 import { salesApi } from '@/api/sales';
 
@@ -58,5 +58,16 @@ export const useGetSales = () => {
     return useQuery({
         queryKey: [],
         queryFn: () => salesApi.findSales(),
+    });
+};
+
+export const useGetSalesInfinite = () => {
+    return useInfiniteQuery({
+        queryKey: ['sales-infinite'],
+        queryFn: ({ pageParam = 1 }) => salesApi.findSales(pageParam, 10),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => {
+            return lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined;
+        },
     });
 };

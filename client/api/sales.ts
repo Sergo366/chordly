@@ -11,10 +11,23 @@ export interface SaleData {
   isNegotiable: boolean;
 }
 
+export interface SalesResponse {
+  data: Clothing[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+}
+
 export const salesApi = {
-  /** Get all clothing items for sale */
-  findSales: async (): Promise<Clothing[]> => {
-    const response = await apiClient.get<Clothing[]>('/sales');
+  /** Get all clothing items for sale with pagination */
+  findSales: async (page: number = 1, limit: number = 10): Promise<SalesResponse> => {
+    const response = await apiClient.get<SalesResponse>('/sales', {
+      params: { page, limit },
+    });
     return response.data;
   },
 };

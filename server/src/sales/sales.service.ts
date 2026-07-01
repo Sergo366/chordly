@@ -10,16 +10,33 @@ export class SalesService {
     private readonly clothesRepository: Repository<Clothing>,
   ) {}
 
-  async getAllSales() {
+  async getAllSales(page: number = 1, limit: number = 10) {
     try {
-      return await this.clothesRepository.find({
+      const [data, total] = await this.clothesRepository.findAndCount({
         where: {
           isForSale: true,
         },
         relations: ['sale'],
+        skip: (page - 1) * limit,
+        take: limit,
+        order: { createdAt: 'DESC' },
       });
+
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+          hasMore: page * limit < total,
+        },
+      };
     } catch (error) {
-      new InternalServerErrorException(error, 'Could not get data for sales');
+      throw new InternalServerErrorException(
+        'Could not get data for sales',
+        error,
+      );
     }
   }
 }
