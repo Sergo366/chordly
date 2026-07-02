@@ -12,12 +12,17 @@ interface SalesCardProps {
 
 export default function SalesCard({ item, className = '' }: SalesCardProps) {
   const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(price);
+    } catch (error) {
+      // Fallback if currency code is invalid
+      return `${price} ${currency}`;
+    }
   };
 
   return (

@@ -24,9 +24,14 @@ export interface SalesResponse {
 
 export const salesApi = {
   /** Get all clothing items for sale with pagination */
-  findSales: async (page: number = 1, limit: number = 10): Promise<SalesResponse> => {
+  findSales: async (
+    page: number = 1,
+    limit: number = 10,
+    searchQuery: string = '',
+    sortBy: string = 'none'
+  ): Promise<SalesResponse> => {
     const response = await apiClient.get<SalesResponse>('/sales', {
-      params: { page, limit },
+      params: { page, limit, search: searchQuery, sort: sortBy },
     });
     return response.data;
   },

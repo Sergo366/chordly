@@ -7,9 +7,16 @@ export class SalesController {
 
   @Get()
   getAllSales(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('search') search: string,
+    @Query('sort') sort: string,
   ) {
-    return this.salesService.getAllSales(parseInt(page), parseInt(limit));
+    return this.salesService.getAllSales(
+      parseInt(page),
+      parseInt(limit),
+      search,
+      sort,
+    );
   }
 }

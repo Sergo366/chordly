@@ -61,10 +61,10 @@ export const useGetSales = () => {
     });
 };
 
-export const useGetSalesInfinite = () => {
+export const useGetSalesInfinite = (searchQuery: string = '', sortBy: string = 'none') => {
     return useInfiniteQuery({
-        queryKey: ['sales-infinite'],
-        queryFn: ({ pageParam = 1 }) => salesApi.findSales(pageParam, 10),
+        queryKey: ['sales-infinite', searchQuery, sortBy],
+        queryFn: ({ pageParam = 1 }) => salesApi.findSales(pageParam, 10, searchQuery, sortBy),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             return lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined;
