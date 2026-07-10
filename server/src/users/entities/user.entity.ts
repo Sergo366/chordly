@@ -32,13 +32,13 @@ export class User {
   @Exclude()
   hashedRt: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   name: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   surname: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   fullName: string | null;
 
   @Column({ type: 'date', nullable: true })
@@ -47,10 +47,10 @@ export class User {
   @Column({ type: 'enum', enum: Gender, nullable: true })
   gender: Gender | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   profileImg: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   location: string | null;
 
   @Column({ type: 'enum', enum: Currency })
