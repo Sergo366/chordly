@@ -7,20 +7,19 @@ import { User, MapPin, Calendar, Camera, Save, X, Loader2 } from 'lucide-react';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error, refetch } = useUserProfile();
-  const updateProfile = useUpdateProfile();
+  const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateProfile();
 
   const [formData, setFormData] = useState({
     name: '',
     surname: '',
     fullName: '',
     birthday: '',
-    gender: '' as Gender | '',
+    gender: '' as Gender,
     location: '',
     currencyPreference: Currency.USD,
   });
 
   const [hasChanges, setHasChanges] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -29,7 +28,7 @@ export default function ProfilePage() {
         surname: profile.surname || '',
         fullName: profile.fullName || '',
         birthday: profile.birthday ? new Date(profile.birthday).toISOString().split('T')[0] : '',
-        gender: profile.gender || '',
+        gender: profile.gender as Gender,
         location: profile.location || '',
         currencyPreference: profile.currencyPreference || Currency.USD,
       });
@@ -43,7 +42,7 @@ export default function ProfilePage() {
         surname: profile.surname || '',
         fullName: profile.fullName || '',
         birthday: profile.birthday ? new Date(profile.birthday).toISOString().split('T')[0] : '',
-        gender: profile.gender || '',
+        gender: profile.gender as Gender,
         location: profile.location || '',
         currencyPreference: profile.currencyPreference || Currency.USD,
       };
@@ -52,16 +51,9 @@ export default function ProfilePage() {
   }, [formData, profile]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await updateProfile.mutateAsync(formData);
+      await updateProfile(formData);
       await refetch();
       setHasChanges(false);
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleCancel = () => {
@@ -71,7 +63,7 @@ export default function ProfilePage() {
         surname: profile.surname || '',
         fullName: profile.fullName || '',
         birthday: profile.birthday ? new Date(profile.birthday).toISOString().split('T')[0] : '',
-        gender: profile.gender || '',
+        gender: profile.gender as Gender,
         location: profile.location || '',
         currencyPreference: profile.currencyPreference || Currency.USD,
       });
@@ -171,7 +163,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white mb-1">
-                  {profile?.fullName || profile?.name || 'Your Name'}
+                  {profile?.fullName || formData.fullName || 'Your Name'}
                 </h2>
                 <p className="text-stone-400 text-sm">{profile?.email}</p>
               </div>
@@ -186,7 +178,7 @@ export default function ProfilePage() {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value, fullName: `${e.target.value} ${formData.surname || ''}` })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-stone-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 placeholder="Your name"
               />
@@ -198,21 +190,9 @@ export default function ProfilePage() {
               <input
                 type="text"
                 value={formData.surname}
-                onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, surname: e.target.value, fullName: `${formData.name || ''} ${e.target.value}` })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-stone-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 placeholder="Your surname"
-              />
-            </div>
-
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-medium text-stone-300 mb-2">Full Name</label>
-              <input
-                type="text"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-stone-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                placeholder="Your full name"
               />
             </div>
 
@@ -269,7 +249,6 @@ export default function ProfilePage() {
               >
                 <option value={Currency.USD}>USD ($)</option>
                 <option value={Currency.EUR}>EUR (€)</option>
-                <option value={Currency.GBP}>GBP (£)</option>
                 <option value={Currency.UAH}>UAH (₴)</option>
               </select>
             </div>
