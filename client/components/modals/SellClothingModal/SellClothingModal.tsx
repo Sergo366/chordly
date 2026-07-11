@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogPanel,
@@ -37,33 +37,39 @@ export function SellClothingModal({ isOpen, onClose, clothing }: SellClothingMod
   const { mutate: updateClothes, isPending } = useUpdateClothes();
   const { toast } = useToast();
 
+  const initialFormData = useMemo(() => {
+    if (!clothing || !isOpen) return initialSaleState;
+    
+    if (clothing.sale) {
+      return {
+        title: clothing.sale.title || clothing.title || '',
+        price: clothing.sale.price || 0,
+        currency: clothing.sale.currency || 'USD',
+        description: clothing.sale.description || '',
+        isNegotiable: clothing.sale.isNegotiable || false,
+      };
+    } else {
+      return {
+        ...initialSaleState,
+        title: clothing.title || '',
+      };
+    }
+  }, [clothing, isOpen]);
+
   useEffect(() => {
     if (clothing && isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsForSale(!clothing.isForSale);
-      if (clothing.sale) {
-        setFormData({
-          title: clothing.sale.title || clothing.title || '',
-          price: clothing.sale.price || 0,
-          currency: clothing.sale.currency || 'USD',
-          description: clothing.sale.description || '',
-          isNegotiable: clothing.sale.isNegotiable || false,
-        });
-      } else {
-        setFormData({
-          ...initialSaleState,
-          title: clothing.title || '',
-        });
-      }
+      setFormData(initialFormData);
     } else if (!isOpen) {
       setFormData(initialSaleState);
       setIsForSale(false);
     }
-  }, [clothing, isOpen]);
+  }, [initialFormData, isOpen, clothing]);
 
   const resetAndClose = () => {
     toast.success(isForSale ? 'Removed from sales' : 'Marked for sales')
     setFormData(initialSaleState);
-    setIsForSale(false);
     onClose();
   };
 

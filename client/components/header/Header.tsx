@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Shirt, LogOut, Settings, User, Plus } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
@@ -99,8 +100,8 @@ export default function Header() {
             <HeadlessMenu as="div" className="relative">
               <HeadlessMenu.Button className="flex text-sm rounded-full focus:outline-none transition-all p-0.5 border border-white/10 hover:border-primary/40 group overflow-hidden cursor-pointer">
                 <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-[#1A1A1E] flex items-center justify-center text-stone-400 font-bold text-xs ring-1 ring-white/5 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                  {userData?.profileImg ? <img src={userData?.profileImg} alt="" /> : 'User'}
+                <div className="h-8 w-8 rounded-full bg-[#1A1A1E] flex items-center justify-center text-stone-400 font-bold text-xs ring-1 ring-white/5 group-hover:text-primary group-hover:bg-primary/5 transition-all overflow-hidden">
+                  {userData?.profileImg ? <Image src={userData?.profileImg} alt="" width={32} height={32} className="w-full h-full object-cover" /> : 'User'}
                 </div>
               </HeadlessMenu.Button>
               <Transition

@@ -19,7 +19,7 @@ export default function SalesCard({ item, className = '' }: SalesCardProps) {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }).format(price);
-    } catch (error) {
+    } catch {
       // Fallback if currency code is invalid
       return `${price} ${currency}`;
     }

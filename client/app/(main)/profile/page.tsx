@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, useMemo } from 'react';
 import { useUserProfile, useUpdateProfile } from '@/hooks/use-user';
 import { Gender, Currency, userApi } from '@/api/user';
 import { User, MapPin, Calendar, Camera, Save, X, Loader2 } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
+import Image from 'next/image';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error, refetch } = useUserProfile();
@@ -20,11 +21,11 @@ export default function ProfilePage() {
     currencyPreference: Currency.USD,
   });
 
-  const [hasChanges, setHasChanges] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: profile.name || '',
         surname: profile.surname || '',
@@ -37,25 +38,23 @@ export default function ProfilePage() {
     }
   }, [profile]);
 
-  useEffect(() => {
-    if (profile) {
-      const currentData = {
-        name: profile.name || '',
-        surname: profile.surname || '',
-        fullName: profile.fullName || '',
-        birthday: profile.birthday ? new Date(profile.birthday).toISOString().split('T')[0] : '',
-        gender: profile.gender as Gender,
-        location: profile.location || '',
-        currencyPreference: profile.currencyPreference || Currency.USD,
-      };
-      setHasChanges(JSON.stringify(formData) !== JSON.stringify(currentData));
-    }
+  const hasChanges = useMemo(() => {
+    if (!profile) return false;
+    const currentData = {
+      name: profile.name || '',
+      surname: profile.surname || '',
+      fullName: profile.fullName || '',
+      birthday: profile.birthday ? new Date(profile.birthday).toISOString().split('T')[0] : '',
+      gender: profile.gender as Gender,
+      location: profile.location || '',
+      currencyPreference: profile.currencyPreference || Currency.USD,
+    };
+    return JSON.stringify(formData) !== JSON.stringify(currentData);
   }, [formData, profile]);
 
   const handleSave = async () => {
       await updateProfile(formData);
       await refetch();
-      setHasChanges(false);
   };
 
   const handlePhotoUpload = async (file: File) => {
@@ -115,7 +114,6 @@ export default function ProfilePage() {
         location: profile.location || '',
         currencyPreference: profile.currencyPreference || Currency.USD,
       });
-      setHasChanges(false);
     }
   };
 
@@ -196,9 +194,11 @@ export default function ProfilePage() {
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                   {profile?.profileImg ? (
-                    <img
+                    <Image
                       src={profile.profileImg}
                       alt="Profile"
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
                     />
                   ) : (
