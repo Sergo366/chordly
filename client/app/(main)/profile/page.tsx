@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { useUserProfile, useUpdateProfile } from '@/hooks/use-user';
-import { Gender, Currency } from '@/api/user';
+import { Gender, Currency, userApi } from '@/api/user';
 import { User, MapPin, Calendar, Camera, Save, X, Loader2 } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error, refetch } = useUserProfile();
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   });
 
   const [hasChanges, setHasChanges] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile) {
@@ -54,6 +56,47 @@ export default function ProfilePage() {
       await updateProfile(formData);
       await refetch();
       setHasChanges(false);
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!file) return;
+
+    try {
+      // Compress image before upload
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
+
+      // Get presigned upload URL
+      const { uploadUrl, fileUrl } = await userApi.getProfilePhotoUploadUrl(compressedFile.name, compressedFile.type);
+
+      // Upload file to S3 using presigned URL
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: compressedFile,
+        headers: { 'Content-Type': compressedFile.type, },
+      });
+
+      // Update user profile with new photo URL
+      await updateProfile({ profileImg: fileUrl });
+      await refetch();
+    } catch (error) {
+      console.error('Failed to upload photo:', error);
+    }
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await handlePhotoUpload(file);
+    }
   };
 
   const handleCancel = () => {
@@ -116,7 +159,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleCancel}
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex cursor-pointer items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <X className="w-4 h-4" />
                   <span>Cancel</span>
@@ -124,7 +167,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-primary/20 border border-primary/30 rounded-xl text-primary hover:bg-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex cursor-pointer items-center gap-2 px-4 py-2.5 bg-primary/20 border border-primary/30 rounded-xl text-primary hover:bg-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -140,8 +183,8 @@ export default function ProfilePage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="max-w-2xl">
+      <div className="max-w-7xl mx-auto px-6 py-8 flex justify-center">
+        <div className="max-w-2xl w-full">
           {/* Profile Photo Section */}
           <div className="bg-[#1A1A1E] border border-white/[0.05] rounded-2xl p-6 mb-6">
             <div className="flex items-center gap-6">
@@ -157,13 +200,28 @@ export default function ProfilePage() {
                     <User className="w-12 h-12 text-stone-500" />
                   )}
                 </div>
-                <button className="absolute bottom-0 right-0 bg-primary/20 border border-primary/30 rounded-full p-2 hover:bg-primary/30 transition-all">
-                  <Camera className="w-4 h-4 text-primary" />
+                <button
+                  className="cursor-pointer absolute bottom-0 right-0 bg-primary/20 border border-primary/30 rounded-full p-2 hover:bg-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleCameraClick}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-primary" />
+                  )}
                 </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white mb-1">
-                  {profile?.fullName || formData.fullName || 'Your Name'}
+                  {formData.fullName || 'Your Name'}
                 </h2>
                 <p className="text-stone-400 text-sm">{profile?.email}</p>
               </div>

@@ -44,8 +44,15 @@ export const userApi = {
     return response.data;
   },
 
-  updateProfile: async (data: UpdateProfileDto): Promise<UserProfile> => {
+  updateProfile: async (data: Partial<UpdateProfileDto>): Promise<UserProfile> => {
     const response = await apiClient.patch<UserProfile>('/user/update', data);
+    return response.data;
+  },
+
+  getProfilePhotoUploadUrl: async (filename: string, contentType: string): Promise<{ uploadUrl: string; fileUrl: string }> => {
+    const response = await apiClient.get<{ uploadUrl: string; fileUrl: string }>('/user/upload-url', {
+      params: { filename, contentType },
+    });
     return response.data;
   },
 };

@@ -7,12 +7,14 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
+import { S3Service } from '../clothes/s3.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private s3Service: S3Service,
   ) {}
 
   async findById(id: string): Promise<User | null> {
@@ -57,5 +59,17 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+  }
+
+  async getProfilePhotoUploadUrl(
+    userId: string,
+    filename: string,
+    contentType: string,
+  ) {
+    return await this.s3Service.getPresignedUploadUrl(
+      filename,
+      contentType,
+      userId,
+    );
   }
 }

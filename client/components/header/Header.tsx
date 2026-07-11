@@ -8,6 +8,7 @@ import { MENU_STYLES, DROPDOWN_TRANSITION } from '@/lib/styles/header';
 import { Fragment, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { classNames } from '@/lib/styles/classNames';
+import { useUserProfile } from '@/hooks/use-user';
 
 const navigation = [
   { name: 'Look analyze', href: '/analyze' },
@@ -16,6 +17,7 @@ const navigation = [
 ];
 
 export default function Header() {
+  const { data: userData } = useUserProfile()
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -98,7 +100,7 @@ export default function Header() {
               <HeadlessMenu.Button className="flex text-sm rounded-full focus:outline-none transition-all p-0.5 border border-white/10 hover:border-primary/40 group overflow-hidden cursor-pointer">
                 <span className="sr-only">Open user menu</span>
                 <div className="h-8 w-8 rounded-full bg-[#1A1A1E] flex items-center justify-center text-stone-400 font-bold text-xs ring-1 ring-white/5 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                  SU
+                  {userData?.profileImg ? <img src={userData?.profileImg} alt="" /> : 'User'}
                 </div>
               </HeadlessMenu.Button>
               <Transition

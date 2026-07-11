@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { GetCurrentUserId } from '../auth/decorators/get-current-user-id.decorator';
@@ -18,5 +18,18 @@ export class UserController {
     @Body() userData: UserDto,
   ) {
     return this.userService.updateUserData(userData, userId);
+  }
+
+  @Get('/upload-url')
+  getUploadUrl(
+    @GetCurrentUserId() userId: string,
+    @Query('filename') filename: string,
+    @Query('contentType') contentType: string,
+  ) {
+    return this.userService.getProfilePhotoUploadUrl(
+      userId,
+      filename,
+      contentType,
+    );
   }
 }

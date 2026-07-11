@@ -4,9 +4,11 @@ import { Currency } from '../../sales/entities/sale.entity';
 
 export class UserDto {
   @IsString()
+  @IsOptional()
   name: string;
 
   @IsString()
+  @IsOptional()
   surname: string;
 
   @IsString()
@@ -18,6 +20,7 @@ export class UserDto {
   birthday: Date | null;
 
   @IsEnum(Gender)
+  @IsOptional()
   gender: Gender;
 
   @IsString()
@@ -29,5 +32,6 @@ export class UserDto {
   location: string;
 
   @IsEnum(Currency)
+  @IsOptional()
   currencyPreference: Currency;
 }
