@@ -10,6 +10,7 @@ import { useDeleteClothes, useUpdateClothes } from '@/hooks/use-clothes';
 import { useToast } from '@/hooks/useToast';
 import { useConfirmation } from '../modals/ConfirmationModal';
 import { deleteConfirmationModalOptions } from './const';
+import { SellClothingModal } from '@/components/modals/SellClothingModal';
 
 interface ClothingCardProps {
   item: Clothing;
@@ -18,7 +19,7 @@ interface ClothingCardProps {
 
 export default function ClothingCard({ item, className = '' }: ClothingCardProps) {
   const { openConfirmation } = useConfirmation()
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState({ detailModal: false, sellModal: false });
   const { mutate: deleteClothes } = useDeleteClothes();
   const { mutate: updateClothes } = useUpdateClothes();
   const { toast } = useToast();
@@ -57,12 +58,7 @@ export default function ClothingCard({ item, className = '' }: ClothingCardProps
 
   const handleToggleSell = (e: React.MouseEvent) => {
     e.stopPropagation();
-    updateClothes({ 
-      clothesId: item.id, 
-      data: { isForSale: !item.isForSale } 
-    }, {
-      onSuccess: () => toast.success(item.isForSale ? 'Removed from sale' : 'Marked for sale')
-    });
+    setIsModalOpen((prev) => ({...prev, sellModal: true}))
   };
 
 
@@ -104,7 +100,7 @@ const getClothingCardActions = (item: Clothing) => [
   return (
     <>
       <div 
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => setIsModalOpen((prev) => ({...prev, detailModal: true}))}
         className={`group relative bg-[#1A1A1E] border border-white/[0.05] rounded-2xl hover:bg-[#232329] transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] cursor-pointer ${className} ${item.isHidden ? 'opacity-60' : ''}`}
       >
         {/* Soft Glass highlight line - placed in a high z-index wrapper that doesn't clip children */}
@@ -235,9 +231,15 @@ const getClothingCardActions = (item: Clothing) => [
       </div>
 
       <ClothingDetailModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isModalOpen.detailModal}
+        onClose={() => setIsModalOpen((prev) => ({...prev, detailModal: false}))}
         item={item}
+      />
+
+      <SellClothingModal
+        clothing={item}
+        isOpen={isModalOpen.sellModal}
+        onClose={() => setIsModalOpen((prev) => ({...prev, sellModal: false}))}
       />
     </>
   );

@@ -29,7 +29,7 @@ export const SPECIAL_SECTION_CONFIG: Record<
   'for-sale': {
     label: 'For Sale',
     description: 'Items you are looking to sell.',
-    EmptyMessage: 'No items listed for sale. Use the card menu to mark items for sale.',
+    EmptyMessage: 'No items listed for sales. Use the card menu to mark items for sales.',
     iconName: 'DollarSign',
     iconClass: 'text-green-400',
     filter: (item) => !!item.isForSale,

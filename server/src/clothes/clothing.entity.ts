@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User } from '../users/entities/user.entity';
 import { Season } from '../common/clothes';
+import { Sale } from '../sales/entities/sale.entity';
 
 @Entity()
 export class Clothing {
@@ -49,6 +51,13 @@ export class Clothing {
 
   @Column({ default: false })
   isForSale: boolean;
+
+  @OneToOne(() => Sale, (sale) => sale.clothing, {
+    eager: true,
+    cascade: true,
+    nullable: true,
+  })
+  sale: Sale | null;
 
   @CreateDateColumn()
   createdAt: Date;

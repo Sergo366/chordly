@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Shirt, LogOut, Settings, User, Plus } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
@@ -8,15 +9,16 @@ import { MENU_STYLES, DROPDOWN_TRANSITION } from '@/lib/styles/header';
 import { Fragment, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { classNames } from '@/lib/styles/classNames';
+import { useUserProfile } from '@/hooks/use-user';
 
 const navigation = [
   { name: 'Look analyze', href: '/analyze' },
   { name: 'My Wardrobe', href: '/wardrobe' },
-  { name: 'Create Look', href: '/create-look' },
-  { name: 'Pricing', href: '/pricing' },
+  { name: 'Sales', href: '/sales' },
 ];
 
 export default function Header() {
+  const { data: userData } = useUserProfile()
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -98,8 +100,8 @@ export default function Header() {
             <HeadlessMenu as="div" className="relative">
               <HeadlessMenu.Button className="flex text-sm rounded-full focus:outline-none transition-all p-0.5 border border-white/10 hover:border-primary/40 group overflow-hidden cursor-pointer">
                 <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-[#1A1A1E] flex items-center justify-center text-stone-400 font-bold text-xs ring-1 ring-white/5 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                  SU
+                <div className="h-8 w-8 rounded-full bg-[#1A1A1E] flex items-center justify-center text-stone-400 font-bold text-xs ring-1 ring-white/5 group-hover:text-primary group-hover:bg-primary/5 transition-all overflow-hidden">
+                  {userData?.profileImg ? <Image src={userData?.profileImg} alt="" width={32} height={32} className="w-full h-full object-cover" /> : 'User'}
                 </div>
               </HeadlessMenu.Button>
               <Transition
@@ -124,21 +126,6 @@ export default function Header() {
                         >
                           <User className={classNames(MENU_STYLES.icon, active ? MENU_STYLES.iconActive : MENU_STYLES.iconInactive)} />
                           Your Profile
-                        </Link>
-                      )}
-                    </HeadlessMenu.Item>
-
-                    <HeadlessMenu.Item>
-                      {({ active }) => (
-                        <Link
-                          href="/library"
-                          className={classNames(
-                            active ? MENU_STYLES.itemActive : MENU_STYLES.itemInactive,
-                            MENU_STYLES.item
-                          )}
-                        >
-                          <Shirt className={classNames(MENU_STYLES.icon, active ? MENU_STYLES.iconActive : MENU_STYLES.iconInactive)} />
-                          My Library
                         </Link>
                       )}
                     </HeadlessMenu.Item>

@@ -6,9 +6,14 @@ import { Clothing } from './clothing.entity';
 import { AiModule } from '../ai/ai.module';
 import { GoogleSearchModule } from '../google-search/google-search.module';
 import { S3Service } from './s3.service';
+import { Sale } from '../sales/entities/sale.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Clothing]), AiModule, GoogleSearchModule],
+  imports: [
+    TypeOrmModule.forFeature([Clothing, Sale]),
+    AiModule,
+    GoogleSearchModule,
+  ],
   controllers: [ClothesController],
   providers: [ClothesService, S3Service],
   exports: [ClothesService],

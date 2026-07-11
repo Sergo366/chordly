@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { clothesApi, SaveClothingData } from '@/api/clothes';
-import { getCategories } from '@/api/categories';
+import { salesApi } from '@/api/sales';
 
 export const useAddClothing = () => {
     const queryClient = useQueryClient();
@@ -49,6 +49,25 @@ export const useUpdateClothes = () => {
         mutationFn: clothesApi.updateClothes,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['clothes'] });
+            queryClient.invalidateQueries({ queryKey: ['sales'] });
+        },
+    });
+};
+
+export const useGetSales = () => {
+    return useQuery({
+        queryKey: [],
+        queryFn: () => salesApi.findSales(),
+    });
+};
+
+export const useGetSalesInfinite = (searchQuery: string = '', sortBy: string = 'none') => {
+    return useInfiniteQuery({
+        queryKey: ['sales-infinite', searchQuery, sortBy],
+        queryFn: ({ pageParam = 1 }) => salesApi.findSales(pageParam, 10, searchQuery, sortBy),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => {
+            return lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined;
         },
     });
 };

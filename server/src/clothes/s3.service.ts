@@ -1,6 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import * as crypto from 'crypto';
 import * as path from 'path';
@@ -87,6 +91,52 @@ export class S3Service {
       console.error('Error generating pre-signed URL:', error);
       throw new InternalServerErrorException(
         `Failed to generate upload URL: ${errMsg}`,
+      );
+    }
+  }
+
+  async deleteFile(fileUrl: string): Promise<void> {
+    try {
+      // Extract key from file URL
+      const customEndpoint = this.configService.get<string>('R2_ENDPOINT');
+      let key = '';
+
+      if (customEndpoint) {
+        const publicUrl =
+          this.configService.get<string>('R2_PUBLIC_URL') ||
+          this.configService.get<string>('S3_PUBLIC_URL');
+        if (publicUrl && fileUrl.startsWith(publicUrl)) {
+          key = fileUrl.replace(`${publicUrl}/`, '');
+        } else if (
+          fileUrl.startsWith(`${customEndpoint}/${this.bucketName}/`)
+        ) {
+          key = fileUrl.replace(`${customEndpoint}/${this.bucketName}/`, '');
+        }
+      } else {
+        const awsRegion =
+          this.configService.get<string>('AWS_REGION') || 'us-east-1';
+        const s3Url = `https://${this.bucketName}.s3.${awsRegion}.amazonaws.com/`;
+        if (fileUrl.startsWith(s3Url)) {
+          key = fileUrl.replace(s3Url, '');
+        }
+      }
+
+      if (!key) {
+        console.warn('Could not extract key from file URL:', fileUrl);
+        return;
+      }
+
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+
+      await this.s3Client.send(command);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error('Error deleting file from S3:', error);
+      throw new InternalServerErrorException(
+        `Failed to delete file: ${errMsg}`,
       );
     }
   }
