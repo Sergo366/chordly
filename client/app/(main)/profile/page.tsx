@@ -62,6 +62,11 @@ export default function ProfilePage() {
     if (!file) return;
 
     try {
+      // Delete old profile photo if exists
+      if (profile?.profileImg) {
+        await userApi.deleteProfilePhoto();
+      }
+
       // Compress image before upload
       const options = {
         maxSizeMB: 1,

@@ -55,4 +55,8 @@ export const userApi = {
     });
     return response.data;
   },
+
+  deleteProfilePhoto: async (): Promise<void> => {
+    await apiClient.delete('/user/profile-photo');
+  },
 };

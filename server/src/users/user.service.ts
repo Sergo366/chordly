@@ -48,7 +48,10 @@ export class UserService {
     });
   }
 
-  async updateUserData(userData: UserDto, userId: string): Promise<User> {
+  async updateUserData(
+    userData: Partial<UserDto>,
+    userId: string,
+  ): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -71,5 +74,13 @@ export class UserService {
       contentType,
       userId,
     );
+  }
+
+  async deleteProfilePhoto(userId: string) {
+    const user = await this.findById(userId);
+    if (user && user.profileImg) {
+      await this.s3Service.deleteFile(user.profileImg);
+      await this.updateUserData({ profileImg: '' }, userId);
+    }
   }
 }

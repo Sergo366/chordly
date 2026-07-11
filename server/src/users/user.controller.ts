@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, Delete } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { GetCurrentUserId } from '../auth/decorators/get-current-user-id.decorator';
@@ -31,5 +31,10 @@ export class UserController {
       filename,
       contentType,
     );
+  }
+
+  @Delete('/profile-photo')
+  deleteProfilePhoto(@GetCurrentUserId() userId: string) {
+    return this.userService.deleteProfilePhoto(userId);
   }
 }
