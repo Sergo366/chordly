@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useGetSalesInfinite } from '@/hooks/use-clothes';
 import SalesCard from '@/components/wardrobe/SalesCard';
 import SalesCardSkeleton from '@/components/wardrobe/SalesCardSkeleton';
@@ -11,7 +11,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 type SortOption = 'newest' | 'oldest' | 'price-asc' | 'price-desc' | 'none';
 
-export default function SalesPage() {
+function SalesContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
@@ -221,5 +221,17 @@ export default function SalesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SalesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <SalesContent />
+    </Suspense>
   );
 }
