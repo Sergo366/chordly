@@ -12,6 +12,7 @@ import { AiModule } from './ai/ai.module';
 import { GoogleSearchModule } from './google-search/google-search.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SalesModule } from './sales/sales.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -34,6 +35,12 @@ import { SalesModule } from './sales/sales.module';
         rejectUnauthorized: false,
       },
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     UsersModule,
     AuthModule,
     ClothesModule,
@@ -60,6 +67,10 @@ import { SalesModule } from './sales/sales.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

@@ -17,6 +17,7 @@ import { Public } from './public.decorator';
 import { RtGuard } from './rt.guard';
 import { GetCurrentUserId } from './decorators/get-current-user-id.decorator';
 import { GetCurrentUser } from './decorators/get-current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -47,6 +48,7 @@ export class AuthController {
     res.clearCookie('refresh_token', { path: '/' });
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Public()
   @Post('signup')
   async signup(
@@ -62,6 +64,7 @@ export class AuthController {
     };
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Public()
   @Post('signin')
   async signin(
