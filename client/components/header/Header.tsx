@@ -111,7 +111,7 @@ export default function Header() {
                 <HeadlessMenu.Items className={MENU_STYLES.items}>
                   <div className={MENU_STYLES.header}>
                     <p className={MENU_STYLES.headerLabel}>Authenticated</p>
-                    <p className={MENU_STYLES.headerValue}>serhii@example.com</p>
+                    <p className={MENU_STYLES.headerValue}>{userData?.email}</p>
                   </div>
                   
                   <div className="px-1.5 space-y-0.5">

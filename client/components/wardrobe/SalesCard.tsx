@@ -3,8 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import { DollarSign, Tag, Heart } from 'lucide-react';
+import Link from 'next/link';
 import { Clothing } from '@/api/clothes';
-
 interface SalesCardProps {
   item: Clothing;
   className?: string;
@@ -26,8 +26,9 @@ export default function SalesCard({ item, className = '' }: SalesCardProps) {
   };
 
   return (
-    <div 
-      className={`group relative bg-[#1A1A1E] border border-white/[0.05] rounded-2xl hover:bg-[#232329] transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] cursor-pointer overflow-hidden ${className}`}
+    <Link 
+      href={`/sales/${item.id}`}
+      className={`group relative bg-[#1A1A1E] border border-white/[0.05] rounded-2xl hover:bg-[#232329] transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] cursor-pointer overflow-hidden block ${className}`}
     >
       {/* Soft Glass highlight line */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none z-20">
@@ -99,6 +100,6 @@ export default function SalesCard({ item, className = '' }: SalesCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
