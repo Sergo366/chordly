@@ -31,21 +31,17 @@ function SalesContent() {
 
   // Update URL params when search or sort changes
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
     if (searchQuery) {
       params.set('search', searchQuery);
-    } else {
-      params.delete('search');
     }
     if (sortBy !== 'none') {
       params.set('sort', sortBy);
-    } else {
-      params.delete('sort');
     }
     const queryString = params.toString();
     const newUrl = queryString ? `/sales?${queryString}` : '/sales';
     router.replace(newUrl);
-  }, [searchQuery, sortBy, searchParams, router]);
+  }, [searchQuery, sortBy, router]);
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback(
