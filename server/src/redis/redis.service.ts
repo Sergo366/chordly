@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RedisService {
-  private readonly redisClient: Redis;
+  readonly redisClient: Redis;
   constructor(private configService: ConfigService) {
     const host = this.configService.get<string>('REDIS_HOST') || 'localhost';
     const port = this.configService.get<number>('REDIS_PORT') || 6379;
