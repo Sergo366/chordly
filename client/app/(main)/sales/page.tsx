@@ -6,13 +6,14 @@ import SalesCard from '@/components/wardrobe/SalesCard';
 import SalesCardSkeleton from '@/components/wardrobe/SalesCardSkeleton';
 import { ShoppingBag, Package, Search, ArrowUpDown } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
 
 type SortOption = 'newest' | 'oldest' | 'price-asc' | 'price-desc' | 'none';
 
 function SalesContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
   const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'none');
@@ -41,20 +42,10 @@ function SalesContent() {
     } else {
       params.delete('sort');
     }
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState({}, '', newUrl);
-  }, [searchQuery, sortBy, searchParams]);
-
-  // Clean up URL params on unmount
-  useEffect(() => {
-    return () => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete('search');
-      params.delete('sort');
-      const newUrl = `${window.location.pathname}`;
-      window.history.replaceState({}, '', newUrl);
-    };
-  }, [searchParams]);
+    const queryString = params.toString();
+    const newUrl = queryString ? `/sales?${queryString}` : '/sales';
+    router.replace(newUrl);
+  }, [searchQuery, sortBy, searchParams, router]);
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback(
