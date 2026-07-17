@@ -14,8 +14,6 @@ import { CategoriesModule } from './categories/categories.module';
 import { SalesModule } from './sales/sales.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { RedisModule } from './redis/redis.module';
-import { RedisService } from './redis/redis.service';
-import { RedisThrottlerStorage } from '@nestjs-redis/throttler-storage';
 
 @Module({
   imports: [
@@ -38,30 +36,23 @@ import { RedisThrottlerStorage } from '@nestjs-redis/throttler-storage';
         rejectUnauthorized: false,
       },
     }),
-    ThrottlerModule.forRootAsync({
-      imports: [RedisModule],
-      inject: [RedisModule],
-      useFactory: (redisService: RedisService) => ({
-        storage: new RedisThrottlerStorage(redisService.redisClient),
-        throttlers: [
-          {
-            name: 'short',
-            ttl: 1000, // 1 second
-            limit: 3, // 3 requests per second
-          },
-          {
-            name: 'medium',
-            ttl: 10000, // 10 seconds
-            limit: 20,
-          },
-          {
-            name: 'long',
-            ttl: 60000, // 1 minute
-            limit: 100,
-          },
-        ],
-      }),
-    }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000, // 1 second
+        limit: 3, // 3 requests per second
+      },
+      {
+        name: 'medium',
+        ttl: 10000, // 10 seconds
+        limit: 20,
+      },
+      {
+        name: 'long',
+        ttl: 60000, // 1 minute
+        limit: 100,
+      },
+    ]),
     UsersModule,
     AuthModule,
     ClothesModule,
