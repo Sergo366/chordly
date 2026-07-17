@@ -13,6 +13,7 @@ import { GoogleSearchModule } from './google-search/google-search.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SalesModule } from './sales/sales.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     GoogleSearchModule,
     CategoriesModule,
     SalesModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

@@ -29,10 +29,6 @@ export class User {
   password: string;
 
   @Column({ type: 'varchar', nullable: true })
-  @Exclude()
-  hashedRt: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
   name: string | null;
 
   @Column({ type: 'varchar', nullable: true })
@@ -55,10 +51,6 @@ export class User {
 
   @Column({ type: 'enum', enum: Currency })
   currencyPreference: Currency;
-
-  @Column({ type: 'timestamptz', nullable: true })
-  @Exclude()
-  rtExpiresAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

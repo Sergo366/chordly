@@ -30,24 +30,6 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async updateRtHash(
-    userId: string,
-    hash: string,
-    expiresAt: Date,
-  ): Promise<void> {
-    await this.userRepository.update(userId, {
-      hashedRt: hash,
-      rtExpiresAt: expiresAt,
-    });
-  }
-
-  async clearRtHash(userId: string): Promise<void> {
-    await this.userRepository.update(userId, {
-      hashedRt: null,
-      rtExpiresAt: null,
-    });
-  }
-
   async updateUserData(
     userData: Partial<UserDto>,
     userId: string,

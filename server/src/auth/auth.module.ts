@@ -7,12 +7,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { RtStrategy } from './rt.strategy';
 import { CategoriesModule } from '../categories/categories.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
     UsersModule,
     CategoriesModule,
     PassportModule,
+    RedisModule,
     JwtModule.register({}),
   ],
   providers: [AuthService, JwtStrategy, RtStrategy],

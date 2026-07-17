@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
@@ -9,13 +10,13 @@ import { SignupDto } from './dtos/signup.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CategoriesService } from '../categories/categories.service';
 import { UserService } from '../users/user.service';
+import { RedisService } from '../redis/redis.service';
 
 export interface Tokens {
   access_token: string;
   refresh_token: string;
   user: {
     id: string;
-    email: string;
   };
 }
 
@@ -25,14 +26,14 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private categoriesService: CategoriesService,
+    private redisService: RedisService,
   ) {}
 
-  async getTokens(userId: string, email: string): Promise<Tokens> {
+  async getTokens(userId: string): Promise<Tokens> {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
-          email,
         },
         {
           secret: process.env.JWT_SECRET || 'secretKey',
@@ -42,7 +43,6 @@ export class AuthService {
       this.jwtService.signAsync(
         {
           sub: userId,
-          email,
         },
         {
           secret: process.env.JWT_REFRESH_SECRET || 'refreshSecretKey',
@@ -56,17 +56,17 @@ export class AuthService {
       refresh_token: rt,
       user: {
         id: userId,
-        email,
       },
     };
   }
 
   async updateRtHash(userId: string, rt: string) {
     const hash = await bcrypt.hash(rt, 10);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // TTL 7 days
-
-    await this.usersService.updateRtHash(userId, hash, expiresAt);
+    try {
+      await this.redisService.set(`rt:${userId}`, hash, 7 * 24 * 60 * 60);
+    } catch (error) {
+      console.warn(`Failed to save RT to Redis for user ${userId}`, error);
+    }
   }
 
   async signup(signupDto: SignupDto): Promise<Tokens> {
@@ -87,7 +87,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id);
     await this.updateRtHash(user.id, tokens.refresh_token);
 
     // Initialize default categories for the user
@@ -105,33 +105,51 @@ export class AuthService {
   }
 
   async login(user: User): Promise<Tokens> {
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id);
     await this.updateRtHash(user.id, tokens.refresh_token);
     return tokens;
   }
 
   async logout(userId: string): Promise<void> {
-    await this.usersService.clearRtHash(userId);
+    try {
+      await this.redisService.del(`rt:${userId}`);
+    } catch (e) {
+      console.error('Redis del error:', e);
+      throw new InternalServerErrorException(
+        'Failed to delete refresh token from Redis. Please try again later. If the issue persists, please contact support. Error: ' +
+          e,
+      );
+    }
   }
 
   async refreshTokens(userId: string, rt: string): Promise<Tokens> {
-    const user = await this.usersService.findById(userId);
+    if (!userId) {
+      throw new BadRequestException('User does not exist');
+    }
 
-    if (!user || !user.hashedRt || !user.rtExpiresAt) {
+    let refreshToken = null;
+
+    try {
+      refreshToken = await this.redisService.get(`rt:${userId}`);
+    } catch (error) {
+      console.warn(`Failed to get RT from Redis for user ${userId}`, error);
+      throw new InternalServerErrorException(
+        'Authentication service is currently unavailable',
+      );
+    }
+
+    if (!refreshToken) {
+      await this.logout(userId);
       throw new ForbiddenException('Access Denied');
     }
 
-    if (new Date() > user.rtExpiresAt) {
-      await this.logout(userId);
-      throw new ForbiddenException('Refresh Token Expired');
+    const rtMatches = await bcrypt.compare(rt, refreshToken);
+
+    if (!rtMatches) {
+      throw new ForbiddenException('Access Denied');
     }
-
-    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
-    if (!rtMatches) throw new ForbiddenException('Access Denied');
-
-    const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-
+    const tokens = await this.getTokens(userId);
+    await this.updateRtHash(userId, tokens.refresh_token);
     return tokens;
   }
 }

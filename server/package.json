@@ -15,6 +15,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "typeorm": "npm run build && npx typeorm -d dist/db/data-source.js",
+    "migration:create": "npx typeorm migration:create",
     "migration:generate": "npm run typeorm -- migration:generate src/db/migrations/$npm_config_name",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert"
@@ -38,6 +39,7 @@
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
     "fs-extra": "^11.3.3",
+    "ioredis": "^5.11.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.17.2",
@@ -56,6 +58,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
+    "@types/ioredis": "^4.28.10",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.1.0",
     "@types/node": "^22.10.7",
