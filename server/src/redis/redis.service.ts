@@ -14,23 +14,29 @@ export class RedisService {
     const password = this.configService.get<string>('REDIS_PASSWORD') || '';
     const useTls = this.configService.get<string>('REDIS_TLS') === 'true';
 
+    this.logger.log(`Connecting to Redis at ${host}:${port}, TLS: ${useTls}`);
+
     const redisOptions: any = {
       host,
       port,
       password,
       retryStrategy: (times: number) => {
-        const delay = Math.min(times * 50, 2000);
+        const delay = Math.min(times * 100, 5000);
+        this.logger.warn(`Redis connection retry ${times}, delay: ${delay}ms`);
         return delay;
       },
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: 5,
       enableReadyCheck: true,
       enableOfflineQueue: true,
       keepAlive: 30000,
+      connectTimeout: 10000,
+      lazyConnect: false,
     };
 
     if (useTls) {
       redisOptions.tls = {
         rejectUnauthorized: false,
+        servername: host,
       };
     }
 
