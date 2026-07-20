@@ -260,6 +260,28 @@ export function AddClothesModal({ isOpen, onClose, searchResults, ticker, initia
                                             </Field>
 
                                             <Field>
+                                                <Label className="block text-sm font-medium text-zinc-400 mb-2">Size</Label>
+                                                <Input
+                                                    type="text"
+                                                    value={formData.size || ''}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, size: e.target.value }))}
+                                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                                    placeholder="e.g. M, 42, XL"
+                                                />
+                                            </Field>
+
+                                            <Field>
+                                                <Label className="block text-sm font-medium text-zinc-400 mb-2">Brand</Label>
+                                                <Input
+                                                    type="text"
+                                                    value={formData.brand || ''}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                                    placeholder="e.g. Nike, Zara"
+                                                />
+                                            </Field>
+
+                                            <Field>
                                                 <Label className="block text-sm font-medium text-zinc-400 mb-2">Season</Label>
                                                 <div className="flex flex-wrap gap-2">
                                                     {SEASONS.map(season => (

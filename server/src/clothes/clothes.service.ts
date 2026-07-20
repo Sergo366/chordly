@@ -67,6 +67,8 @@ export class ClothesService {
       userTitle: dto.userTitle,
       imageUrl: dto.imageUrl,
       ticker: dto.ticker,
+      size: dto.size,
+      brand: dto.brand,
       userId,
     });
 

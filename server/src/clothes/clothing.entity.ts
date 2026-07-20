@@ -25,6 +25,12 @@ export class Clothing {
   @Column()
   type: string;
 
+  @Column({ type: 'text', nullable: true, default: null })
+  size: string | number | null;
+
+  @Column({ type: 'text', nullable: true, default: null })
+  brand: string | null;
+
   @Column({ nullable: true })
   category: string;
 

@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsOptional,
   ValidateNested,
+  ValidateIf,
 } from 'class-validator';
 import { CATEGORIES, SEASONS, Season } from '../../common/clothes';
 import { CreateSaleDto } from './create-sale.dto';
@@ -22,6 +23,16 @@ export class CreateClothingDto {
 
   @IsString()
   type: string;
+
+  @ValidateIf((o, v) => {
+    return typeof v !== 'string' && typeof v !== 'number';
+  })
+  @IsOptional()
+  size: string | number | null;
+
+  @IsString()
+  @IsOptional()
+  brand: string | null;
 
   @IsString()
   @IsIn(CATEGORIES)

@@ -1,17 +1,17 @@
 export const MENU_STYLES = {
-  items: "origin-top-right absolute right-0 mt-3 rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.9)] bg-[#0c0c0e] border border-white/20 focus:outline-none py-1.5 overflow-hidden z-[100]",
-  item: "flex items-center px-2 py-2 text-[13px] font-medium rounded-xl transition-all gap-3 w-full cursor-pointer",
-  itemActive: "bg-white/10 text-white font-semibold shadow-inner",
-  itemInactive: "text-stone-400 hover:text-stone-200 hover:bg-white/5",
-  itemDanger: "bg-red-500/10 text-red-500",
-  itemDangerInactive: "text-red-500/60",
+  items: "origin-top-right absolute right-0 mt-4 w-56 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)] bg-[#0D0D0F]/95 backdrop-blur-3xl border border-white/10 focus:outline-none py-2 overflow-hidden z-[100]",
+  item: "flex items-center px-4 py-3 text-[14px] font-medium rounded-xl transition-all gap-3 w-full cursor-pointer",
+  itemActive: "bg-primary/20 text-white font-semibold shadow-[0_0_20px_rgba(212,175,53,0.1)]",
+  itemInactive: "text-stone-300 hover:text-white hover:bg-white/5",
+  itemDanger: "bg-red-500/10 text-red-400 hover:bg-red-500/20",
+  itemDangerInactive: "text-red-400/70 hover:text-red-400",
   icon: "h-4 w-4 transition-colors",
   iconActive: "text-primary",
   iconInactive: "text-stone-500",
-  separator: "h-px bg-white/5 my-1.5 mx-3",
-  header: "px-4 py-2 border-b border-white/5 mb-1 bg-white/[0.02]",
-  headerLabel: "text-[10px] text-stone-500 font-bold uppercase tracking-widest mb-1",
-  headerValue: "text-[13px] font-semibold text-white/90 truncate",
+  separator: "h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-2 mx-4",
+  header: "px-4 py-3 border-b border-white/5 mb-2 bg-gradient-to-b from-white/[0.02] to-transparent",
+  headerLabel: "text-[11px] text-stone-500 font-bold uppercase tracking-widest mb-1.5",
+  headerValue: "text-[14px] font-semibold text-white/90 truncate",
 };
 
 export const DROPDOWN_TRANSITION = {

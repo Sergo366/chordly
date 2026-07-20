@@ -5,6 +5,8 @@ export type FormValues = {
     userTitle: string;
     category: Category | "";
     type: string;
+    size: string | null;
+    brand: string | null;
     seasons: Season[];
 }
 
@@ -13,5 +15,7 @@ export const defaultFormValues: FormValues = {
     userTitle: '',
     category: '',
     type: '',
+    size: null,
+    brand: null,
     seasons: [],
 };
