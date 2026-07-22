@@ -30,7 +30,6 @@ export class AuthController {
       httpOnly: false, // Accessible by Next.js middleware
       secure: true, // Must be true for sameSite: 'none'
       sameSite: isProd ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
       path: '/',
     });
 
