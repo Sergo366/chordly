@@ -105,6 +105,12 @@ export const clothesApi = {
     await apiClient.delete(`/clothes/${id}`);
   },
 
+  /** Get a single clothing item by ID */
+  findById: async (id: string): Promise<Clothing> => {
+    const response = await apiClient.get<Clothing>(`/clothes/${id}`);
+    return response.data;
+  },
+
   /**
    * Request a presigned URL for a direct S3/R2 upload.
    * The returned `fileUrl` is stripped of the signature query string so it can be stored permanently.
