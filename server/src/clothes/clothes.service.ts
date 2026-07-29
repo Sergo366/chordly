@@ -82,9 +82,9 @@ export class ClothesService {
     });
   }
 
-  async findOne(userId: string, id: string): Promise<Clothing> {
+  async findOne(id: string): Promise<Clothing> {
     const clothing = await this.clothesRepository.findOne({
-      where: { id, userId },
+      where: { id },
     });
 
     if (!clothing) {
@@ -94,10 +94,10 @@ export class ClothesService {
     return clothing;
   }
 
-  async update(userId: string, clothesId: string, dto: UpdateClothingDto) {
-    const clothing = await this.findOne(userId, clothesId);
+  async update(clothesId: string, dto: UpdateClothingDto) {
+    const clothing = await this.findOne(clothesId);
 
-    if (!dto.isForSale && clothing.sale) {
+    if (dto.isForSale === false && clothing.sale) {
       await this.saleRepository.delete(clothing.sale.id);
       clothing.sale = null;
     }

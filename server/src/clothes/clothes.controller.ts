@@ -54,11 +54,10 @@ export class ClothesController {
 
   @Patch(':id')
   update(
-    @GetCurrentUserId() userId: string,
     @Param('id', ParseUUIDPipe) clothesId: string,
     @Body() updateClothingDto: UpdateClothingDto,
   ) {
-    return this.clothesService.update(userId, clothesId, updateClothingDto);
+    return this.clothesService.update(clothesId, updateClothingDto);
   }
 
   @Get()
@@ -67,11 +66,8 @@ export class ClothesController {
   }
 
   @Get(':id')
-  findOne(
-    @GetCurrentUserId() userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
-    return this.clothesService.findOne(userId, id);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.clothesService.findOne(id);
   }
 
   @Delete(':id')
